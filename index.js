@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import http from 'http';
 import getSongAtIdController from './controllers/getSongAtIdController.js';
+import createSongController from './controllers/createSongController.js';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(bodyParser.json());
 
 // Set up controllers
 getSongAtIdController(app);
+createSongController(app);
 
 http.createServer(app).listen(port, () => {
   // eslint-disable-next-line no-console
