@@ -1,4 +1,4 @@
-import getSongAtId from '../services/getSongAtId.js';
+import { getSongAtId } from '../services/songService.js';
 
 export default function getSongAtIdController(app) {
   app.get('/songs/:id', async (req, res) => {

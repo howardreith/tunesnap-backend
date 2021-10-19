@@ -1,4 +1,4 @@
-import createSong from '../services/createSong.js';
+import { createSong } from '../services/songService.js';
 
 export default function createSongController(app) {
   app.post('/songs/create', async (req, res) => {
