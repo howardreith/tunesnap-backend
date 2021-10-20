@@ -23,7 +23,7 @@ describe('SongModel', () => {
   let songData;
   beforeEach(() => {
     songData = {
-      name: 'Erlkonig',
+      title: 'Erlkonig',
       composer: 'Franz Schubert',
     };
   });
@@ -33,13 +33,13 @@ describe('SongModel', () => {
     const savedSong = await validSong.save();
     // Object Id should be defined when successfully saved to MongoDB.
     expect(savedSong._id).toBeDefined();
-    expect(savedSong.name).toBe(songData.name);
+    expect(savedSong.title).toBe(songData.title);
     expect(savedSong.composer).toBe(songData.composer);
   });
 
   it('throws an error with insufficient data', async () => {
-    songData.name = undefined;
+    songData.title = undefined;
     const invalidSong = new SongModel(songData);
-    await expect(invalidSong.save()).rejects.toThrowError('Song validation failed: name: Path `name` is required');
+    await expect(invalidSong.save()).rejects.toThrowError('Song validation failed: title: Path `title` is required');
   });
 });

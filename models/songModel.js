@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const songModel = new mongoose.Schema({
-  name: { type: String, required: true },
+  title: { type: String, required: true },
   composer: { type: String, required: true },
   lyricist: { type: String, required: false },
   compositionDate: { type: Date, required: false },

@@ -9,8 +9,8 @@ export async function getSongAtId(id) {
   return SongModel.findById(id);
 }
 
-export async function getAllSongs(filter = null) {
-  return SongModel.find();
+export async function getAllSongs(filter = {}) {
+  return SongModel.find(filter);
 }
 
 export default {
