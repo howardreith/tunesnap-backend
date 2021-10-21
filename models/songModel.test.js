@@ -1,23 +1,17 @@
-import mongoose from 'mongoose';
 import SongModel from './songModel';
+import { clearDatabase, connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers';
 
 describe('SongModel', () => {
   beforeAll(async () => {
-    await mongoose.connect(global.__MONGO_URI__, { useNewUrlParser: true }, (err) => {
-      if (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        process.exit(1);
-      }
-    });
+    await connectToInMemoryDb();
+  });
+
+  afterAll(async () => {
+    await disconnectFromInMemoryDb();
   });
 
   afterEach(async () => {
-    const collections = await mongoose.connection.db.collections();
-    collections.map((conn) => {
-      conn.deleteMany({});
-      return null;
-    });
+    await clearDatabase();
   });
 
   let songData;

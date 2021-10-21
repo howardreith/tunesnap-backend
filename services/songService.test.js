@@ -1,46 +1,46 @@
 import mongoose from 'mongoose';
 import { createSong, getSongAtId, getAllSongs } from './songService.js';
 import SongModel from '../models/songModel';
+import { connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers';
 
 describe('songService', () => {
   beforeAll(async () => {
-    await mongoose.connect(global.__MONGO_URI__, { useNewUrlParser: true }, (err) => {
-      if (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        process.exit(1);
-      }
-    });
+    await connectToInMemoryDb();
+  });
+
+  afterAll(async () => {
+    await disconnectFromInMemoryDb();
   });
 
   afterEach(async () => {
-    const collections = await mongoose.connection.db.collections();
-    collections.map((conn) => {
+    const collections = await mongoose.connection.db?.collections();
+    collections?.map((conn) => {
       conn.deleteMany({});
       return null;
     });
   });
 
-  afterEach(async () => {
-    const collections = await mongoose.connection.db.collections();
-    await collections[0].deleteMany({});
-  });
-
   describe('createSong', () => {
+    it('throws with no accompaniments array', async () => {
+      const invalidSong = { title: 'Erlkonig', composer: 'Franz Schubert' };
+      await expect(createSong(invalidSong)).rejects.toThrowError('Accompaniments must be an array');
+    });
+
     it('successfully creates a song in the database', async () => {
-      const song = { title: 'Erlkonig', composer: 'Franz Schubert' };
+      const song = { title: 'Erlkonig', composer: 'Franz Schubert', accompaniments: [] };
       const createdSong = await createSong(song);
       expect(createdSong).toBeTruthy();
       expect(createdSong._id).toBeTruthy();
       const retrieved = await SongModel.findById(createdSong._id);
       expect(retrieved.title).toEqual(song.title);
       expect(retrieved.composer).toEqual(song.composer);
+      expect(retrieved.accompaniments).toEqual([]);
     });
   });
 
   describe('getSongAtIde', () => {
     it('retrieves the song at the given _id', async () => {
-      const songData = { title: 'Erlkonig', composer: 'Franz Schubert' };
+      const songData = { title: 'Erlkonig', composer: 'Franz Schubert', accompaniments: [] };
       const validSong = new SongModel(songData);
       const savedSong = await validSong.save();
       const id = savedSong._id;

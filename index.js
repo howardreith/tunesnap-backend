@@ -16,7 +16,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 const uri = process.env.MONGO_URI;
-mongoose.connect(uri, { useNewUrlParser: true });
+mongoose.connect(uri, { });
 const { connection } = mongoose;
 connection.once('open', () => {
   // eslint-disable-next-line no-console
