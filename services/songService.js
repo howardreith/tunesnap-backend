@@ -1,8 +1,9 @@
 import SongModel from '../models/songModel.js';
 
 export async function createSong(song) {
-  if (!Array.isArray(song.accompaniments)) {
-    throw Error('Accompaniments must be an array');
+  const songData = { ...song };
+  if (!Array.isArray(songData.accompaniments)) {
+    songData.accompaniments = [];
   }
   const newSong = new SongModel(song);
   return newSong.save();

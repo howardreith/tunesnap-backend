@@ -12,8 +12,14 @@ dotenv.config();
 
 const port = process.env.PORT || 8080;
 const app = express();
+const frontEndUrl = process.env.FRONT_END_URL;
 
-app.use(cors());
+const corsOptions = {
+  origin: frontEndUrl,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 const uri = process.env.MONGO_URI;
 mongoose.connect(uri, { });
