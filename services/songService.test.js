@@ -21,11 +21,6 @@ describe('songService', () => {
   });
 
   describe('createSong', () => {
-    it('throws with no accompaniments array', async () => {
-      const invalidSong = { title: 'Erlkonig', composer: 'Franz Schubert' };
-      await expect(createSong(invalidSong)).rejects.toThrowError('Accompaniments must be an array');
-    });
-
     it('successfully creates a song in the database', async () => {
       const song = { title: 'Erlkonig', composer: 'Franz Schubert', accompaniments: [] };
       const createdSong = await createSong(song);
