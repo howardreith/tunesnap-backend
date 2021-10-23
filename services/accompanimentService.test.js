@@ -33,14 +33,20 @@ describe('accompanimentService', () => {
         songId: savedSong._id,
         url: 'https://www.youtube.com/aUrl',
       };
-      const createdAccompaniment = await createAccompaniment(accompanimentData);
-      expect(createdAccompaniment).toBeTruthy();
+      const songWithCreatedAccompaniment = await createAccompaniment(accompanimentData);
+      expect(songWithCreatedAccompaniment).toBeTruthy();
+      expect(songWithCreatedAccompaniment._id).toEqual(savedSong._id);
+      const createdAccompaniment = songWithCreatedAccompaniment.accompaniments[0];
       expect(createdAccompaniment._id).toBeTruthy();
-      const retrievedAccompaniment = await AccompanimentModel.findById(createdAccompaniment._id);
+      const retrievedAccompaniment = await AccompanimentModel
+        .findById(createdAccompaniment._id);
       expect(retrievedAccompaniment.songId).toEqual(savedSong._id);
       expect(retrievedAccompaniment.url).toEqual(accompanimentData.url);
       const updatedSong = await SongModel.findById(savedSong._id);
-      expect(updatedSong.accompaniments[0]).toEqual(createdAccompaniment._id);
+      expect(updatedSong.accompaniments[0])
+        .toEqual(songWithCreatedAccompaniment.accompaniments[0]._id);
+      expect(createdAccompaniment.url).toEqual(retrievedAccompaniment.url);
+      expect(createdAccompaniment.songId).toEqual(retrievedAccompaniment.songId);
     });
   });
 });

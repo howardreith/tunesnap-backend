@@ -10,20 +10,12 @@ export async function createSong(song) {
 }
 
 export async function getSongAtId(id) {
-  return SongModel.findById(id);
+  const song = await SongModel.findById(id);
+  return song.populate('accompaniments');
 }
 
 export async function getAllSongs(filter = {}) {
   return SongModel.find(filter);
-}
-
-export async function addAccompanimentToSong(songId, accompanimentId) {
-  const song = await getSongAtId(songId);
-  if (!song.accompaniments) {
-    song.accompaniments = [];
-  }
-  song.accompaniments.push(accompanimentId);
-  return song.save();
 }
 
 export default {

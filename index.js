@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import getSongAtIdController from './controllers/getSongAtIdController.js';
 import createSongController from './controllers/createSongController.js';
 import getAllSongsController from './controllers/getAllSongsController.js';
+import addAccompanimentToSongController from './controllers/addAccompanimentToSong.js';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ connection.once('open', () => {
 getSongAtIdController(app);
 createSongController(app);
 getAllSongsController(app);
+addAccompanimentToSongController(app);
 
 http.createServer(app).listen(port, () => {
   // eslint-disable-next-line no-console
