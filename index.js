@@ -8,6 +8,7 @@ import getSongAtIdController from './controllers/getSongAtIdController.js';
 import createSongController from './controllers/createSongController.js';
 import getAllSongsController from './controllers/getAllSongsController.js';
 import addAccompanimentToSongController from './controllers/addAccompanimentToSong.js';
+import seedDatabaseController from './controllers/admin/seedDatabaseController.js';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ getSongAtIdController(app);
 createSongController(app);
 getAllSongsController(app);
 addAccompanimentToSongController(app);
+seedDatabaseController(app);
 
 http.createServer(app).listen(port, () => {
   // eslint-disable-next-line no-console

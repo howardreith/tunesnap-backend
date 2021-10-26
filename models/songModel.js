@@ -5,8 +5,11 @@ const songModel = new mongoose.Schema({
   composer: { type: String, required: true },
   lyricist: { type: String, required: false },
   compositionDate: { type: Date, required: false },
-  opus: { type: String, required: false },
+  opusNumber: { type: String, required: false },
   songSetId: { type: mongoose.Schema.Types.ObjectId, ref: 'SongSet' },
+  songCycle: { type: String, required: false },
+  songCycleIndex: { type: String, required: false},
+  textAndTranslation: { type: String, required: false },
   accompaniments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
 });
 // eslint-disable-next-line new-cap

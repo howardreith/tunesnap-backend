@@ -14,8 +14,8 @@ export async function getSongAtId(id) {
   return song.populate('accompaniments');
 }
 
-export async function getAllSongs(filter = {}) {
-  return SongModel.find(filter);
+export async function getAllSongs(filter = {}, limit = 10) {
+  return SongModel.find(filter).limit(limit);
 }
 
 export default {
