@@ -32,10 +32,10 @@ connection.once('open', () => {
 });
 
 // Set up controllers
+addAccompanimentToSongController(app);
 getSongAtIdController(app);
 createSongController(app);
 getAllSongsController(app);
-addAccompanimentToSongController(app);
 seedDatabaseController(app);
 
 http.createServer(app).listen(port, () => {

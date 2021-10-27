@@ -1,7 +1,10 @@
 import mongoose from 'mongoose';
 import { createSong, getSongAtId, getAllSongs } from './songService.js';
-import SongModel from '../models/songModel';
-import { connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers';
+// Import this so accompaniment model is added and song model can use it
+// eslint-disable-next-line no-unused-vars
+import AccompanimentModel from '../models/accompanimentModel.js';
+import SongModel from '../models/songModel.js';
+import { connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers.js';
 
 describe('songService', () => {
   beforeAll(async () => {

@@ -8,7 +8,6 @@ const realData = require('../seedJsonData');
 export async function seedDb() {
   await Promise.all(realData.map(async (datum) => {
     datum.songs.map(async (song) => {
-      console.log('===> song', song)
       await createSong(song);
     });
   }));

@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import AccompanimentModel from './accompanimentModel';
 import SongModel from './songModel';
 import { clearDatabase, connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers';
