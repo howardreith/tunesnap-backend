@@ -1,5 +1,7 @@
 import { createRequire } from 'module';
+import { writeFileSync } from 'fs';
 import { createSong } from './songService.js';
+import SongModel from '../models/songModel.js';
 
 const require = createRequire(import.meta.url);
 const mockData = require('../mockData.json');
@@ -13,6 +15,13 @@ export async function seedDb() {
   }));
 }
 
+export async function getSongTitles() {
+  SongModel.find().distinct('title', (error, results) => {
+    writeFileSync('songTitlesFromDb.json', JSON.stringify(results));
+  });
+}
+
 export default {
   seedDb,
+  getSongTitles,
 };

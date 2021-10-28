@@ -18,8 +18,13 @@ export async function getAllSongs(filter = {}, limit = 10) {
   return SongModel.find(filter).limit(limit);
 }
 
+export async function getSongViaAutocomplete() {
+
+}
+
 export default {
   createSong,
   getAllSongs,
   getSongAtId,
+  getSongViaAutocomplete,
 };

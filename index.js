@@ -9,6 +9,8 @@ import createSongController from './controllers/createSongController.js';
 import getAllSongsController from './controllers/getAllSongsController.js';
 import addAccompanimentToSongController from './controllers/addAccompanimentToSong.js';
 import seedDatabaseController from './controllers/admin/seedDatabaseController.js';
+import autocompleteController from './controllers/autocompleteController.js';
+import getSongTitlesController from './controllers/admin/getSongTitlesController.js';
 
 dotenv.config();
 
@@ -37,6 +39,8 @@ getSongAtIdController(app);
 createSongController(app);
 getAllSongsController(app);
 seedDatabaseController(app);
+getSongTitlesController(app);
+autocompleteController(app);
 
 http.createServer(app).listen(port, () => {
   // eslint-disable-next-line no-console

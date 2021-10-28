@@ -31,6 +31,22 @@ describe('SongModel', () => {
     expect(savedSong.composer).toBe(songData.composer);
   });
 
+  it('finds a song by title using ordinary find', async () => {
+    const validSong = new SongModel(songData);
+    const savedSong = await validSong.save();
+    const foundSong = (await SongModel.find({ title: 'Erlkonig' }))[0];
+    expect(foundSong.title).toEqual(savedSong.title);
+    expect(foundSong._id).toEqual(savedSong._id);
+  });
+
+  it('finds a song by title using atlas search', async () => {
+    const validSong = new SongModel(songData);
+    const savedSong = await validSong.save();
+    const foundSong = (await SongModel.find({ search: 'Erlkonig' }))[0];
+    expect(foundSong.title).toEqual(savedSong.title);
+    expect(foundSong._id).toEqual(savedSong._id);
+  });
+
   it('throws an error with insufficient data', async () => {
     songData.title = undefined;
     const invalidSong = new SongModel(songData);

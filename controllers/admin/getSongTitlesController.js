@@ -1,7 +1,7 @@
 import { getSongTitles } from '../../services/adminService.js';
 
-export default function seedDatabaseController(app) {
-  app.get('/admin/seedDb', async (req, res) => {
+export default function getSongTitlesController(app) {
+  app.get('/admin/getSongTitles', async (req, res) => {
     try {
       const response = await getSongTitles();
       res.status(200).send({
