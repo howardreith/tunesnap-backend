@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
-import { createSong, getSongAtId, getAllSongs } from './songService.js';
+import {
+  createSong, getSongAtId, getAllSongs, getSongViaAutocomplete,
+} from './songService.js';
 // Import this so accompaniment model is added and song model can use it
 // eslint-disable-next-line no-unused-vars
 import AccompanimentModel from '../models/accompanimentModel.js';
@@ -60,6 +62,30 @@ describe('songService', () => {
       expect(retrievedSongs.length).toEqual(2);
       expect(retrievedSongs[0]).toMatchObject(songData1);
       expect(retrievedSongs[1]).toMatchObject(songData2);
+    });
+  });
+
+  describe('getSongViaAutocomplete', () => {
+    it('should return all songs that match the value', async () => {
+      const songData1 = { title: 'Erlkonig', composer: 'Franz Schubert' };
+      const songData2 = { title: 'Der Lindenbaum', composer: 'Franz Schubert' };
+      const validSong1 = new SongModel(songData1);
+      const validSong2 = new SongModel(songData2);
+      await validSong1.save();
+      await validSong2.save();
+      const result = await getSongViaAutocomplete('kon');
+      expect(result).toEqual(['Erlkonig']);
+    });
+
+    it('should return all songs that match the value despite accents', async () => {
+      const songData1 = { title: 'Erlkönig', composer: 'Franz Schubert' };
+      const songData2 = { title: 'Der Lindenbaum', composer: 'Franz Schubert' };
+      const validSong1 = new SongModel(songData1);
+      const validSong2 = new SongModel(songData2);
+      await validSong1.save();
+      await validSong2.save();
+      const result = await getSongViaAutocomplete('kon');
+      expect(result).toEqual(['Erlkönig']);
     });
   });
 });
