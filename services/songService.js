@@ -19,7 +19,7 @@ export async function getAllSongs(filter = {}, limit = 10) {
   return SongModel.find(filter).limit(limit);
 }
 
-export async function getSongViaAutocomplete(searchString, sortBy, clearCache = false) {
+export async function getSongViaAutocomplete(searchString, sortBy, page, clearCache = false) {
   const songs = await getAndSortSongsAccordingToParam(sortBy, clearCache);
   const songIndexes = [];
   for (let i = 0; i < songs.length; i += 1) {
@@ -33,7 +33,10 @@ export async function getSongViaAutocomplete(searchString, sortBy, clearCache = 
   for (let i = 0; i < songIndexes.length; i += 1) {
     matchesArray.push(songs[songIndexes[i]]);
   }
-  return matchesArray;
+  const start = page * 10;
+  const end = (page + 1) * 10;
+  const pageOfMatches = matchesArray.slice(start, end);
+  return { songs: pageOfMatches, numberOfSongs: matchesArray.length };
 }
 
 export default {

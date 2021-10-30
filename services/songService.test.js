@@ -73,8 +73,8 @@ describe('songService', () => {
       const validSong2 = new SongModel(songData2);
       await validSong1.save();
       await validSong2.save();
-      const result = await getSongViaAutocomplete('kon', null, true);
-      expect(result).toEqual([expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkonig' })]);
+      const result = await getSongViaAutocomplete('kon', null, 0, true);
+      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkonig' })] });
     });
 
     it('should return all songs that match the value despite accents', async () => {
@@ -84,8 +84,8 @@ describe('songService', () => {
       const validSong2 = new SongModel(songData2);
       await validSong1.save();
       await validSong2.save();
-      const result = await getSongViaAutocomplete('kon', null, true);
-      expect(result).toEqual([expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkönig' })]);
+      const result = await getSongViaAutocomplete('kon', null, 0, true);
+      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkönig' })] });
     });
   });
 });
