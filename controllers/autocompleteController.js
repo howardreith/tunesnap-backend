@@ -1,9 +1,9 @@
 import { getSongViaAutocomplete } from '../services/songService.js';
 
 export default function autocompleteController(app) {
-  app.get('/songs/search/:queryString', async (req, res) => {
-    const { queryString } = req.params;
-    getSongViaAutocomplete(queryString).then((response) => {
+  app.post('/songs/search', async (req, res) => {
+    const { queryString, sortBy } = req.body;
+    getSongViaAutocomplete(queryString, sortBy).then((response) => {
       res.status(200).send({
         status: 'OK',
         data: response,

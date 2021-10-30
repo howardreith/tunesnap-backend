@@ -1,12 +1,5 @@
-import schedule from 'node-schedule';
 import SongModel from '../models/songModel.js';
-
-let songs = [];
-schedule.scheduleJob('0 0 * * *', async () => {
-  songs = (await SongModel.find({}));
-  // eslint-disable-next-line no-console
-  console.info('Songs cache has been updated');
-});
+import { getAndSortSongsAccordingToParam } from '../utils/songHelpers.js';
 
 export async function createSong(song) {
   const songData = { ...song };
@@ -26,12 +19,8 @@ export async function getAllSongs(filter = {}, limit = 10) {
   return SongModel.find(filter).limit(limit);
 }
 
-export async function getSongViaAutocomplete(searchString) {
-  if (!songs || songs.length === 0) {
-    songs = await SongModel.find({});
-    // eslint-disable-next-line no-console
-    console.info('Titles array has been updated in getSongViaAutocomplete');
-  }
+export async function getSongViaAutocomplete(searchString, sortBy, clearCache = false) {
+  const songs = await getAndSortSongsAccordingToParam(sortBy, clearCache);
   const songIndexes = [];
   for (let i = 0; i < songs.length; i += 1) {
     if (songs[i].title.toLowerCase().includes(searchString.toLowerCase())
