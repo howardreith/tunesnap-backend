@@ -73,7 +73,14 @@ describe('songService', () => {
       const validSong2 = new SongModel(songData2);
       await validSong1.save();
       await validSong2.save();
-      const result = await getSongViaAutocomplete('kon', null, 0, true);
+      const input = {
+        titleSearchValue: 'kon',
+        composerSearchValue: '',
+        songSetSearchValue: '',
+        sortBy: 'title',
+        page: 0,
+      };
+      const result = await getSongViaAutocomplete(input);
       expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkonig' })] });
     });
 
@@ -84,8 +91,117 @@ describe('songService', () => {
       const validSong2 = new SongModel(songData2);
       await validSong1.save();
       await validSong2.save();
-      const result = await getSongViaAutocomplete('kon', null, 0, true);
+      const input = {
+        titleSearchValue: 'kon',
+        composerSearchValue: '',
+        songSetSearchValue: '',
+        sortBy: 'title',
+        page: 0,
+      };
+      const result = await getSongViaAutocomplete(input, true);
       expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkönig' })] });
+    });
+
+    it('should return all songs that match the composer', async () => {
+      const songData1 = { title: 'Erlkönig', composer: 'Someone else' };
+      const songData2 = { title: 'Der Lindenbaum', composer: 'Franz Schubert' };
+      const validSong1 = new SongModel(songData1);
+      const validSong2 = new SongModel(songData2);
+      await validSong1.save();
+      await validSong2.save();
+      const input = {
+        titleSearchValue: '',
+        composerSearchValue: 'Schubert',
+        songSetSearchValue: '',
+        sortBy: 'title',
+        page: 0,
+      };
+      const result = await getSongViaAutocomplete(input, true);
+      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })] });
+    });
+
+    it('should filter by both composer and title', async () => {
+      const songData1 = { title: 'Erlkönig', composer: 'Franz Schubert' };
+      const songData2 = { title: 'Der Lindenbaum', composer: 'Franz Schubert' };
+      const songData3 = { title: 'Proud Songsters', composer: 'Gerald Finzi' };
+      const validSong1 = new SongModel(songData1);
+      const validSong2 = new SongModel(songData2);
+      const validSong3 = new SongModel(songData3);
+      await validSong1.save();
+      await validSong2.save();
+      await validSong3.save();
+      const input = {
+        titleSearchValue: 'Erl',
+        composerSearchValue: 'Schubert',
+        songSetSearchValue: '',
+        sortBy: 'title',
+        page: 0,
+      };
+      const result = await getSongViaAutocomplete(input, true);
+      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkönig' })] });
+    });
+
+    it('should filter by song cycle', async () => {
+      const songData1 = { title: 'Erlkönig', composer: 'Franz Schubert' };
+      const songData2 = { title: 'Der Lindenbaum', composer: 'Franz Schubert', songCycle: 'Winterreise' };
+      const songData3 = { title: 'Proud Songsters', composer: 'Gerald Finzi', songCycle: 'Earth and Air and Rain' };
+      const validSong1 = new SongModel(songData1);
+      const validSong2 = new SongModel(songData2);
+      const validSong3 = new SongModel(songData3);
+      await validSong1.save();
+      await validSong2.save();
+      await validSong3.save();
+      const input = {
+        titleSearchValue: '',
+        composerSearchValue: '',
+        songSetSearchValue: 'Winterreise',
+        sortBy: 'title',
+        page: 0,
+      };
+      const result = await getSongViaAutocomplete(input, true);
+      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })] });
+    });
+
+    it('should filter by song cycle, composer, and title', async () => {
+      const songData1 = { title: 'Der Leiermann', composer: 'Franz Schubert', songCycle: 'Winterreise' };
+      const songData2 = { title: 'Der Lindenbaum', composer: 'Franz Schubert', songCycle: 'Winterreise' };
+      const songData3 = { title: 'Proud Songsters', composer: 'Gerald Finzi', songCycle: 'Earth and Air and Rain' };
+      const validSong1 = new SongModel(songData1);
+      const validSong2 = new SongModel(songData2);
+      const validSong3 = new SongModel(songData3);
+      await validSong1.save();
+      await validSong2.save();
+      await validSong3.save();
+      const input = {
+        titleSearchValue: 'Lindenbaum',
+        composerSearchValue: 'Schubert',
+        songSetSearchValue: 'Winterreise',
+        sortBy: 'title',
+        page: 0,
+      };
+      const result = await getSongViaAutocomplete(input, true);
+      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })] });
+    });
+
+    it('should filter by song cycle, and composere', async () => {
+      const songData1 = { title: 'Auf dem Flusse', composer: 'Reiner Bredemeyer', songCycle: 'Winterreise' };
+      const songData2 = { title: 'Der Lindenbaum', composer: 'Franz Schubert', songCycle: 'Winterreise' };
+      const songData3 = { title: 'Proud Songsters', composer: 'Gerald Finzi', songCycle: 'Earth and Air and Rain' };
+      const validSong1 = new SongModel(songData1);
+      const validSong2 = new SongModel(songData2);
+      const validSong3 = new SongModel(songData3);
+      await validSong1.save();
+      await validSong2.save();
+      await validSong3.save();
+      const input = {
+        titleSearchValue: '',
+        composerSearchValue: 'Schubert',
+        songSetSearchValue: 'Winterreise',
+        sortBy: 'title',
+        page: 0,
+      };
+      const result = await getSongViaAutocomplete(input, true);
+      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })] });
     });
   });
 });

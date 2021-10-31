@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import atlasPlugin from 'mongoose-atlas-search';
 
 const songModel = new mongoose.Schema({
   title: { type: String, required: true, index: true },
@@ -15,23 +14,5 @@ const songModel = new mongoose.Schema({
 }, { collection: 'songs' });
 // eslint-disable-next-line new-cap
 const SongModel = new mongoose.model('Song', songModel);
-
-// atlasPlugin.initialize({
-//   model: SongModel,
-//   overwriteFind: true,
-//   searchKey: 'search',
-//   searchFunction: (query) => ({
-//     wildcard: {
-//       query: `${query}*`,
-//       path: 'title',
-//       allowAnalyzedField: true,
-//     },
-//   }),
-// });
-//
-// (async () => {
-//   const resultWithSearch = await SongModel.find({search: 'test user'}); //aggregation is used
-//   const resultWithoutSearch = await SongModel.find({name: 'test user'}); //standard "find" is used
-// })();
 
 export default SongModel;

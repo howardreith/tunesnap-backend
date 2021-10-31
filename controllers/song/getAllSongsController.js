@@ -1,4 +1,4 @@
-import { getAllSongs } from '../services/songService.js';
+import { getAllSongs } from '../../services/songService.js';
 
 export default function getAllSongsController(app) {
   app.get('/songs', async (req, res) => {
