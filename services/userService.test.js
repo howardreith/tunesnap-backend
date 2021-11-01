@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers';
 import UserModel from '../models/userModel';
-import { signupUser, loginUser } from './userService';
+import { registerUser, loginUser } from './userService';
 
 describe('userService', () => {
   beforeAll(async () => {
@@ -38,11 +38,11 @@ describe('userService', () => {
 
   describe('signupUser', () => {
     it('should throw if the user already exists', async () => {
-      await expect(signupUser(stockUser.email, 'password')).rejects.toThrowError('User already exists');
+      await expect(registerUser(stockUser.email, 'password')).rejects.toThrowError('User already exists');
     });
 
     it('should create a user in the db', async () => {
-      const result = await signupUser('Lisa@gnome.com', 'mice');
+      const result = await registerUser('Lisa@gnome.com', 'mice');
       const newUser = await UserModel.find({ email: 'Lisa@gnome.com' });
       expect(newUser[0]).toBeTruthy();
       expect(newUser[0]._id).toEqual(result._id);
@@ -50,7 +50,7 @@ describe('userService', () => {
     });
 
     it('should return the user info but without the password', async () => {
-      const result = await signupUser('Lisa@gnome.com', 'mice');
+      const result = await registerUser('Lisa@gnome.com', 'mice');
       expect(result.email).toEqual('Lisa@gnome.com');
       expect(result._id).toBeTruthy();
       expect(result.password).toBeUndefined();

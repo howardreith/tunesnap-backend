@@ -1,9 +1,9 @@
-import { signupUser } from '../../services/userService.js';
+import { registerUser } from '../../services/userService.js';
 
-export default function signupController(app) {
-  app.post('/user/login', async (req, res) => {
+export default function registerController(app) {
+  app.post('/user/register', async (req, res) => {
     const { email, password } = req.body;
-    signupUser(email, password).then((response) => {
+    registerUser(email, password).then((response) => {
       res.status(200).send({
         status: 'OK',
         data: response,

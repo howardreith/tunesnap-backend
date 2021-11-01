@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import UserModel from '../models/userModel.js';
-import { generateToken } from '../utils/authHelpers';
+import { generateToken } from '../utils/authHelpers.js';
 
 export async function loginUser(email, password) {
   const user = (await UserModel.find({ email }))[0]; if (!user) {
@@ -22,7 +22,7 @@ export async function loginUser(email, password) {
   }
 }
 
-export async function signupUser(email, password) {
+export async function registerUser(email, password) {
   const existingUser = await UserModel.find({ email });
   if (existingUser && existingUser.length > 0) {
     throw Error('User already exists');

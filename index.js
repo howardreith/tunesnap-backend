@@ -7,11 +7,13 @@ import mongoose from 'mongoose';
 import getSongAtIdController from './controllers/song/getSongAtIdController.js';
 import createSongController from './controllers/song/createSongController.js';
 import getAllSongsController from './controllers/song/getAllSongsController.js';
-import addAccompanimentToSongController from './controllers/addAccompanimentToSong.js';
+import addAccompanimentToSongController from './controllers/accompaniment/addAccompanimentToSong.js';
 import seedDatabaseController from './controllers/admin/seedDatabaseController.js';
 import autocompleteController from './controllers/song/autocompleteController.js';
 import getSongTitlesController from './controllers/admin/getSongTitlesController.js';
 import pruneSongsController from './controllers/admin/pruneSongsController.js';
+import loginController from './controllers/user/loginController.js';
+import registerController from './controllers/user/registerController.js';
 
 dotenv.config();
 
@@ -35,6 +37,10 @@ connection.once('open', () => {
 });
 
 // Set up controllers
+// User Controllers
+loginController(app);
+registerController(app);
+
 // Accompaniment Controllers
 addAccompanimentToSongController(app);
 
