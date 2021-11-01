@@ -29,7 +29,7 @@ export async function registerUser(email, password) {
   }
   const salt = await bcrypt.genSalt(10);
   const encryptedPassword = await bcrypt.hash(password, salt);
-  const newUser = new UserModel({ email, password: encryptedPassword });
+  const newUser = new UserModel({ email, password: encryptedPassword, dateJoined: new Date() });
   const savedUser = await newUser.save();
   // Making certain password is not returned
   return {

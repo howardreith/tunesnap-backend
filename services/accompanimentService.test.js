@@ -1,5 +1,6 @@
 import AccompanimentModel from '../models/accompanimentModel';
 import SongModel from '../models/songModel';
+import UserModel from '../models/userModel';
 import { createAccompaniment } from './accompanimentService';
 import { clearDatabase, connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers';
 
@@ -17,7 +18,15 @@ describe('accompanimentService', () => {
   });
 
   let savedSong;
+  let savedUser;
   beforeEach(async () => {
+    const userData = {
+      email: 'david@gnome.com',
+      password: 'anEncryptedPassword',
+      dateJoined: new Date(),
+    };
+    const validUser = new UserModel(userData);
+    savedUser = await validUser.save();
     const songData = {
       title: 'Erlkonig',
       composer: 'Franz Schubert',
@@ -33,7 +42,10 @@ describe('accompanimentService', () => {
         songId: savedSong._id,
         url: 'https://www.youtube.com/aUrl',
       };
-      const songWithCreatedAccompaniment = await createAccompaniment(accompanimentData);
+      const songWithCreatedAccompaniment = await createAccompaniment(
+        accompanimentData,
+        savedUser._id.toString(),
+      );
       expect(songWithCreatedAccompaniment).toBeTruthy();
       expect(songWithCreatedAccompaniment._id).toEqual(savedSong._id);
       const createdAccompaniment = songWithCreatedAccompaniment.accompaniments[0];

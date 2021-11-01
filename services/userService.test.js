@@ -31,7 +31,7 @@ describe('userService', () => {
     const salt = await bcrypt.genSalt(10);
     stockUserPassword = 'swiftTheFox';
     encryptedStockUserPassword = await bcrypt.hash(stockUserPassword, salt);
-    stockUser = { email: 'David@gnome.com', password: encryptedStockUserPassword };
+    stockUser = { email: 'David@gnome.com', password: encryptedStockUserPassword, dateJoined: new Date() };
     const stockUserModel = new UserModel(stockUser);
     savedStockUser = await stockUserModel.save();
   });

@@ -1,6 +1,7 @@
 import AccompanimentModel from './accompanimentModel';
 import SongModel from './songModel';
 import { clearDatabase, connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers';
+import UserModel from './userModel';
 
 describe('AccompanimentModel', () => {
   beforeAll(async () => {
@@ -17,7 +18,15 @@ describe('AccompanimentModel', () => {
 
   let accompanimentData;
   let songId;
+  let savedUser;
   beforeEach(async () => {
+    const userData = {
+      email: 'david@gnome.com',
+      password: 'anEncryptedPassword',
+      dateJoined: new Date(),
+    };
+    const validUser = new UserModel(userData);
+    savedUser = await validUser.save();
     const songData = {
       title: 'Erlkonig',
       composer: 'Franz Schubert',
@@ -29,6 +38,9 @@ describe('AccompanimentModel', () => {
     accompanimentData = {
       songId,
       url: 'https://www.youtube.com/random',
+      addedBy: savedUser._id,
+      dateCreated: new Date(),
+      dateUpdated: new Date(),
     };
   });
 

@@ -19,6 +19,7 @@ describe('SongModel', () => {
     userData = {
       email: 'David@gnome.com',
       password: 'f2980j9ej985j89345j',
+      dateJoined: new Date(),
     };
   });
 

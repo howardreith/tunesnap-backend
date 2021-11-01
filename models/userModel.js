@@ -6,6 +6,7 @@ const userModel = new mongoose.Schema({
   },
   password: { type: String, required: true },
   name: { type: String, required: false },
+  dateJoined: { type: Date, required: true },
   accompanimentSubmissions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
   favoriteSongs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Song' }],
   favoriteAccompaniments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
