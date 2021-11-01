@@ -4,16 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import http from 'http';
 import mongoose from 'mongoose';
-import getSongAtIdController from './controllers/song/getSongAtIdController.js';
-import createSongController from './controllers/song/createSongController.js';
-import getAllSongsController from './controllers/song/getAllSongsController.js';
-import addAccompanimentToSongController from './controllers/accompaniment/addAccompanimentToSong.js';
-import seedDatabaseController from './controllers/admin/seedDatabaseController.js';
-import autocompleteController from './controllers/song/autocompleteController.js';
-import getSongTitlesController from './controllers/admin/getSongTitlesController.js';
-import pruneSongsController from './controllers/admin/pruneSongsController.js';
-import loginController from './controllers/user/loginController.js';
-import registerController from './controllers/user/registerController.js';
+import implementControllers from './utils/implementControllers.js';
 
 dotenv.config();
 
@@ -35,25 +26,7 @@ connection.once('open', () => {
   // eslint-disable-next-line no-console
   console.info('MongoDB database connection established');
 });
-
-// Set up controllers
-// User Controllers
-loginController(app);
-registerController(app);
-
-// Accompaniment Controllers
-addAccompanimentToSongController(app);
-
-// Song Controllers
-getSongAtIdController(app);
-createSongController(app);
-getAllSongsController(app);
-autocompleteController(app);
-
-// Admin Controllers
-seedDatabaseController(app);
-getSongTitlesController(app);
-pruneSongsController(app);
+implementControllers(app);
 
 http.createServer(app).listen(port, () => {
   // eslint-disable-next-line no-console
