@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers';
 import UserModel from '../models/userModel';
-import { registerUser, loginUser } from './userService';
+import { registerUser, loginUser, updatePassword } from './userService';
 
 describe('userService', () => {
   beforeAll(async () => {
@@ -80,6 +80,23 @@ describe('userService', () => {
       expect(result.token).toBeTruthy();
       const decoded = jwt.decode(result.token);
       expect(decoded.id).toEqual(savedStockUser._id.toString());
+    });
+  });
+
+  describe('updatePassword', () => {
+    it('should throw with an invalid user id', async () => {
+      await expect(updatePassword('myNewPassword',
+        'aninvalidIdd'))
+        .rejects.toThrowError('User at ID aninvalidIdd not found');
+    });
+
+    it('should update the password with a new encrypted password', async () => {
+      const result = await updatePassword('myNewPassword', savedStockUser._id.toString());
+      const updated = await UserModel.findById(savedStockUser._id);
+
+      expect(result).toEqual(savedStockUser._id.toString());
+      expect(updated.password).toBeTruthy();
+      expect(savedStockUser.password).not.toEqual(updated.password);
     });
   });
 });

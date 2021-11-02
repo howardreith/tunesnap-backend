@@ -40,3 +40,16 @@ export async function registerUser(email, password) {
     favoriteAccompaniments: savedUser.favoriteAccompaniments,
   };
 }
+
+export async function updatePassword(newPassword, userId) {
+  console.log('===> got here', newPassword, userId)
+  const salt = await bcrypt.genSalt(10);
+  const encryptedPassword = await bcrypt.hash(newPassword, salt);
+  const updateResult = await UserModel.findByIdAndUpdate(
+    userId, { password: encryptedPassword },
+  );
+  if (!updateResult) {
+    throw Error(`User at ID ${userId} not found`);
+  }
+  return updateResult._id.toString();
+}
