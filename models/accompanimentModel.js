@@ -5,6 +5,14 @@ const ratingSchema = new mongoose.Schema({
   rating: Number,
 });
 
+const fileSchema = new mongoose.Schema({
+  originalFilename: String,
+  mimetype: String,
+  size: String,
+  url: { type: String, required: true },
+  s3Key: String,
+});
+
 const accompanimentModel = new mongoose.Schema({
   songId: { type: mongoose.Schema.Types.ObjectId, ref: 'Song' },
   url: { type: String, required: true },
@@ -13,6 +21,7 @@ const accompanimentModel = new mongoose.Schema({
   dateUpdated: { type: Date, required: true },
   price: { type: String, required: false },
   key: { type: String, required: false },
+  file: { type: fileSchema, required: false },
   ratings: [{ type: ratingSchema, default: {} }],
   addedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 });
