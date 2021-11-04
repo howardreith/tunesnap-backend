@@ -31,7 +31,9 @@ describe('userService', () => {
     const salt = await bcrypt.genSalt(10);
     stockUserPassword = 'swiftTheFox';
     encryptedStockUserPassword = await bcrypt.hash(stockUserPassword, salt);
-    stockUser = { email: 'David@gnome.com', password: encryptedStockUserPassword, dateJoined: new Date() };
+    stockUser = {
+      email: 'David@gnome.com', password: encryptedStockUserPassword, dateJoined: new Date(), displayName: 'David the Gnome',
+    };
     const stockUserModel = new UserModel(stockUser);
     savedStockUser = await stockUserModel.save();
   });
@@ -42,7 +44,7 @@ describe('userService', () => {
     });
 
     it('should create a user in the db', async () => {
-      const result = await registerUser('Lisa@gnome.com', 'mice');
+      const result = await registerUser('Lisa@gnome.com', 'mice', 'Lisa the Gnome');
       const newUser = await UserModel.find({ email: 'Lisa@gnome.com' });
       expect(newUser[0]).toBeTruthy();
       expect(newUser[0]._id).toEqual(result._id);
@@ -50,7 +52,7 @@ describe('userService', () => {
     });
 
     it('should return the user info but without the password', async () => {
-      const result = await registerUser('Lisa@gnome.com', 'mice');
+      const result = await registerUser('Lisa@gnome.com', 'mice', 'Lisa the Gnome');
       expect(result.email).toEqual('Lisa@gnome.com');
       expect(result._id).toBeTruthy();
       expect(result.password).toBeUndefined();

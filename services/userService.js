@@ -22,19 +22,22 @@ export async function loginUser(email, password) {
   }
 }
 
-export async function registerUser(email, password) {
+export async function registerUser(email, password, displayName) {
   const existingUser = await UserModel.find({ email });
   if (existingUser && existingUser.length > 0) {
     throw Error('User already exists');
   }
   const salt = await bcrypt.genSalt(10);
   const encryptedPassword = await bcrypt.hash(password, salt);
-  const newUser = new UserModel({ email, password: encryptedPassword, dateJoined: new Date() });
+  const newUser = new UserModel({
+    email, password: encryptedPassword, dateJoined: new Date(), displayName,
+  });
   const savedUser = await newUser.save();
   // Making certain password is not returned
   return {
     _id: savedUser._id,
     email: savedUser.email,
+    displayName: savedUser.displayName,
     accompanimentSubmissions: savedUser.accompanimentSubmissions,
     favoriteSongs: savedUser.favoriteSongs,
     favoriteAccompaniments: savedUser.favoriteAccompaniments,

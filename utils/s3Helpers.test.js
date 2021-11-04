@@ -1,8 +1,9 @@
-import { uploadFile } from './s3Helpers';
+import { getFileAndAddItToResponse, uploadFile } from './s3Helpers';
 
 const mS3Instance = {
   upload: jest.fn().mockReturnThis(),
   promise: jest.fn(),
+  getObject: jest.fn().mockReturnThis(),
 };
 
 jest.mock('aws-sdk', () => ({ S3: jest.fn(() => mS3Instance) }));
@@ -21,6 +22,19 @@ describe('s3Helpers', () => {
         Bucket: 'media.tunesnap',
       };
       expect(result).toEqual(expected);
+    });
+  });
+
+  describe('getFileAndAddItToResponse', () => {
+    it('should send along the file', async () => {
+      const fileData = { originalFileName: 'aHappyFile.mp3', s3Key: 'anS3Key' };
+      const res = {
+        attachment: jest.fn(), on: jest.fn(), once: jest.fn(), emit: jest.fn(),
+      };
+      await getFileAndAddItToResponse(fileData, res);
+      expect(res.on).toHaveBeenCalled();
+      expect(res.emit).toHaveBeenCalled();
+      expect(res.once).toHaveBeenCalled();
     });
   });
 });

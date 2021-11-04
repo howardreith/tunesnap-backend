@@ -23,6 +23,7 @@ describe('AccompanimentModel', () => {
     const userData = {
       email: 'david@gnome.com',
       password: 'anEncryptedPassword',
+      displayName: 'David the Gnome',
       dateJoined: new Date(),
     };
     const validUser = new UserModel(userData);
@@ -54,8 +55,8 @@ describe('AccompanimentModel', () => {
   });
 
   it('throws an error with insufficient data', async () => {
-    accompanimentData.url = undefined;
+    accompanimentData.songId = undefined;
     const invalidAccompaniment = new AccompanimentModel(accompanimentData);
-    await expect(invalidAccompaniment.save()).rejects.toThrowError('Accompaniment validation failed: url: Path `url` is required');
+    await expect(invalidAccompaniment.save()).rejects.toThrowError('Accompaniment validation failed: songId: Path `songId` is required');
   });
 });

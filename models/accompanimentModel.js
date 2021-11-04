@@ -14,8 +14,8 @@ const fileSchema = new mongoose.Schema({
 });
 
 const accompanimentModel = new mongoose.Schema({
-  songId: { type: mongoose.Schema.Types.ObjectId, ref: 'Song' },
-  url: { type: String, required: true },
+  songId: { type: mongoose.Schema.Types.ObjectId, ref: 'Song', required: true },
+  url: { type: String, required: false },
   artist: { type: String, required: false },
   dateCreated: { type: Date, required: true },
   dateUpdated: { type: Date, required: true },

@@ -2,8 +2,8 @@ import { registerUser } from '../../services/userService.js';
 
 export default function registerController(app) {
   app.post('/user/register', async (req, res) => {
-    const { email, password } = req.body;
-    registerUser(email, password).then((response) => {
+    const { email, password, displayName } = req.body;
+    registerUser(email, password, displayName).then((response) => {
       res.status(200).send({
         status: 'OK',
         data: response,

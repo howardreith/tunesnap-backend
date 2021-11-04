@@ -25,3 +25,8 @@ export async function uploadFile(file) {
 
   return s3.upload(params).promise();
 }
+
+export function getFileAndAddItToResponse(fileData, res) {
+  res.attachment(fileData.originalFileName);
+  s3.getObject({ Bucket, Key: fileData.s3Key }).createReadStream().pipe(res);
+}
