@@ -137,9 +137,11 @@ describe('accompanimentService', () => {
       expect(fullyPopulatedSubmissions.accompanimentSubmissions[0].addedBy.toString())
         .toEqual(savedUser._id.toString());
       const fullyPopulatedOwned = await updatedUser.populate('accompanimentsOwned');
-      expect(fullyPopulatedOwned.accompanimentsOwned[0].file.originalFilename)
+      const relevantAccompaniment = await AccompanimentModel
+        .findById(fullyPopulatedOwned.accompanimentsOwned[0].accompaniment._id);
+      expect(relevantAccompaniment.file.originalFilename)
         .toEqual(fileData.originalname);
-      expect(fullyPopulatedOwned.accompanimentsOwned[0].addedBy.toString())
+      expect(relevantAccompaniment.addedBy.toString())
         .toEqual(savedUser._id.toString());
     });
 
@@ -162,7 +164,8 @@ describe('accompanimentService', () => {
         artist: 'David the Gnome',
         dateCreated: new Date(),
         dateUpdated: new Date(),
-        price: '$0.00',
+        price: 0,
+        currency: 'USD',
         key: 'D Minor',
         file: {
           originalFileName: 'ErlkonigAccompaniment.mp3',

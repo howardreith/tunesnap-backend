@@ -1,12 +1,10 @@
 import { getAccompanimentAtId } from '../../services/accompanimentService.js';
-import protectEndpoint from '../../utils/authMiddleware.js';
 import { decodeToken } from '../../utils/authHelpers.js';
 
 export default function getSongAtIdController(app) {
-  app.get('/accompaniments/:id', protectEndpoint, async (req, res) => {
+  app.get('/accompaniments/:id', async (req, res) => {
     const { id: accompanimentId } = req.params;
-    const { id: userId } = decodeToken(req.headers.authorization);
-    getAccompanimentAtId(accompanimentId, userId).then((response) => {
+    getAccompanimentAtId(accompanimentId).then((response) => {
       res.status(200).send({
         status: 'OK',
         data: response,

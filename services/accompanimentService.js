@@ -49,7 +49,14 @@ export async function createAccompaniment(accompanimentData, creatorId, fileToUp
   await UserModel.findByIdAndUpdate(creatorId,
     { accompanimentSubmissions: userAccompanimentSubmissions });
   if (fileToUpload) {
-    const userOwnedAccompaniments = [...user.accompanimentsOwned, savedAccompaniment._id];
+    const dataToAddToOwnedACcompaniments = {
+      accompaniment: savedAccompaniment._id,
+      pricePaid: 0,
+      currency: 'USD',
+      dateOfPurchase: new Date(),
+
+    };
+    const userOwnedAccompaniments = [...user.accompanimentsOwned, dataToAddToOwnedACcompaniments];
     await UserModel.findByIdAndUpdate(creatorId,
       { accompanimentsOwned: userOwnedAccompaniments });
   }
@@ -58,8 +65,7 @@ export async function createAccompaniment(accompanimentData, creatorId, fileToUp
   return song.populate('accompaniments');
 }
 
-export async function getAccompanimentAtId(id, userId) {
-  // TODO if the user does not own the accompaniment they should not be able to see it
+export async function getAccompanimentAtId(id) {
   const accompaniment = await (await (await AccompanimentModel.findById(id)).populate('songId')).populate('addedBy');
   return {
     _id: accompaniment._id,

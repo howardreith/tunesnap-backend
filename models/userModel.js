@@ -1,5 +1,12 @@
 import mongoose from 'mongoose';
 
+const purchaseSchema = new mongoose.Schema({
+  accompaniment: { type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment', required: true },
+  pricePaid: { type: Number, required: true },
+  currency: { type: String, required: true },
+  dateOfPurchase: { type: Date, required: true },
+});
+
 const userModel = new mongoose.Schema({
   email: {
     type: String, required: true, unique: true, index: true,
@@ -9,9 +16,10 @@ const userModel = new mongoose.Schema({
   displayName: { type: String, required: true },
   dateJoined: { type: Date, required: true },
   accompanimentSubmissions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
-  accompanimentsOwned: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
+  accompanimentsOwned: [{ type: purchaseSchema }],
   favoriteSongs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Song' }],
   favoriteAccompaniments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
+  cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
 }, { collection: 'users' });
 // eslint-disable-next-line new-cap
 const UserModel = new mongoose.model('User', userModel);

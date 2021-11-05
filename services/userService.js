@@ -3,7 +3,8 @@ import UserModel from '../models/userModel.js';
 import { generateToken } from '../utils/authHelpers.js';
 
 export async function loginUser(email, password) {
-  const user = (await UserModel.find({ email }))[0]; if (!user) {
+  const user = (await UserModel.find({ email }))[0];
+  if (!user) {
     throw Error('User not found');
   }
   const isCorrectPassword = await bcrypt.compare(password, user.password);
@@ -14,9 +15,12 @@ export async function loginUser(email, password) {
     return {
       _id: user.id,
       email: user.email,
+      displayName: user.displayName,
       accompanimentSubmissions: user.accompanimentSubmissions,
       favoriteSongs: user.favoriteSongs,
       favoriteAccompaniments: user.favoriteAccompaniments,
+      cart: user.cart,
+      accompanimentsOwned: user.accompanimentsOwned,
       token,
     };
   }

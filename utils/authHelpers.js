@@ -9,5 +9,8 @@ export function decodeToken(token) {
   if (parsedToken.startsWith('Bearer ')) {
     parsedToken = parsedToken.replace('Bearer ', '');
   }
+  if (!parsedToken || ['null', 'undefined'].includes(parsedToken)) {
+    return { id: null };
+  }
   return jwt.decode(parsedToken);
 }

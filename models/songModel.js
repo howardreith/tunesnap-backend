@@ -6,7 +6,6 @@ const songModel = new mongoose.Schema({
   lyricist: { type: String, required: false },
   compositionDate: { type: Date, required: false },
   opusNumber: { type: String, required: false },
-  songSetId: { type: mongoose.Schema.Types.ObjectId, ref: 'SongSet' },
   songCycle: { type: String, required: false },
   songCycleIndex: { type: String, required: false },
   textAndTranslation: { type: String, required: false },
