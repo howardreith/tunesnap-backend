@@ -192,16 +192,18 @@ describe('authMiddleware', () => {
         size: '1mb',
       };
 
+      const { song: updatedSong } = await createAccompaniment(
+        accompanimentWithFileThatIsNotFreebutOwnedData,
+        userWhoWillCreateStuff._id, nonFreeButOwnedFileData,
+      );
+
       [
         accompanimentWithUrlAndNoFileThatIsFree,
         accompanimentWithUrlAndNoFileThatIsNotFree,
         accompanimentWithFileThatIsFree,
         accompanimentWithFileThatIsNotFree,
         accompanimentWithFileThatIsNotFreeButIsOwned,
-      ] = (await createAccompaniment(
-        accompanimentWithFileThatIsNotFreebutOwnedData,
-        userWhoWillCreateStuff._id, nonFreeButOwnedFileData,
-      )).accompaniments;
+      ] = updatedSong.accompaniments;
 
       const ownedAccompaniments = [];
       const purchase = {

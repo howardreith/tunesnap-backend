@@ -44,25 +44,25 @@ export async function createAccompaniment(accompanimentData, creatorId, fileToUp
   const accompaniments = [...song.accompaniments, savedAccompaniment._id];
   await SongModel.findByIdAndUpdate(accompanimentData.songId, { accompaniments });
 
-  const user = await UserModel.findById(creatorId);
+  let user = await UserModel.findById(creatorId);
   const userAccompanimentSubmissions = [...user.accompanimentSubmissions, savedAccompaniment._id];
   await UserModel.findByIdAndUpdate(creatorId,
     { accompanimentSubmissions: userAccompanimentSubmissions });
   if (fileToUpload) {
-    const dataToAddToOwnedACcompaniments = {
+    const dataToAddToOwnedAccompaniments = {
       accompaniment: savedAccompaniment._id,
       pricePaid: 0,
       currency: 'USD',
       dateOfPurchase: new Date(),
-
     };
-    const userOwnedAccompaniments = [...user.accompanimentsOwned, dataToAddToOwnedACcompaniments];
+    const userOwnedAccompaniments = [...user.accompanimentsOwned, dataToAddToOwnedAccompaniments];
     await UserModel.findByIdAndUpdate(creatorId,
       { accompanimentsOwned: userOwnedAccompaniments });
+    user = await UserModel.findById(creatorId);
   }
 
-  song = await SongModel.findById(accompanimentData.songId);
-  return song.populate('accompaniments');
+  song = await SongModel.findById(accompanimentData.songId).populate('accompaniments');
+  return { user, song };
 }
 
 export async function getAccompanimentAtId(id) {

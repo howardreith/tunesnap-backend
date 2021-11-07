@@ -8,6 +8,9 @@ import autocompleteController from '../controllers/song/autocompleteController.j
 import updatePasswordController from '../controllers/user/updatePasswordController.js';
 import getAccompanimentByIdController from '../controllers/accompaniment/getAccompanimentByIdController.js';
 import getAccompanimentFileByIdController from '../controllers/accompaniment/getAccompanimentFileByIdController.js';
+import addAccompanimentToCartController from '../controllers/user/addAccompanimentToCartController.js';
+import getCartController from '../controllers/user/getCartController.js';
+import removeAccompanimentFromCartController from '../controllers/user/removeAccompanimentFromCartController.js';
 // import seedDatabaseController from '../controllers/admin/seedDatabaseController.js';
 // import getSongTitlesController from '../controllers/admin/getSongTitlesController.js';
 // import pruneSongsController from '../controllers/admin/pruneSongsController.js';
@@ -17,6 +20,9 @@ export default function implementControllers(app) {
   loginController(app);
   registerController(app);
   updatePasswordController(app);
+  addAccompanimentToCartController(app);
+  removeAccompanimentFromCartController(app);
+  getCartController(app);
 
   // Accompaniment Controllers
   addAccompanimentToSongController(app);

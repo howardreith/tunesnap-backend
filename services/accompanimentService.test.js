@@ -45,7 +45,7 @@ describe('accompanimentService', () => {
         songId: savedSong._id,
         url: 'https://www.youtube.com/aUrl',
       };
-      const songWithCreatedAccompaniment = await createAccompaniment(
+      const { song: songWithCreatedAccompaniment } = await createAccompaniment(
         accompanimentData,
         savedUser._id.toString(),
       );
@@ -73,7 +73,7 @@ describe('accompanimentService', () => {
         mimetype: 'mp3',
         size: '1mb',
       };
-      const songWithCreatedAccompaniment = await createAccompaniment(
+      const { song: songWithCreatedAccompaniment, user } = await createAccompaniment(
         accompanimentData,
         savedUser._id.toString(),
         fileData,
@@ -94,6 +94,10 @@ describe('accompanimentService', () => {
       expect(createdAccompaniment.url).toEqual(retrievedAccompaniment.url);
       expect(createdAccompaniment.songId).toEqual(retrievedAccompaniment.songId);
       expect(createdAccompaniment.file._id).toEqual(retrievedAccompaniment.file._id);
+      expect(user.accompanimentSubmissions[0].toString())
+        .toEqual(createdAccompaniment._id.toString());
+      expect(user.accompanimentsOwned[0].accompaniment.toString())
+        .toEqual(createdAccompaniment._id.toString());
     });
 
     it('adds linked accompaniment to the creators list of submissions', async () => {
