@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 import AccompanimentModel from '../models/accompanimentModel.js';
 import SongModel from '../models/songModel.js';
 import { uploadFile, getFileAndAddItToResponse } from '../utils/s3Helpers.js';
 import UserModel from '../models/userModel.js';
+import { decodeToken } from '../utils/authHelpers.js';
 
 export async function createAccompaniment(accompanimentData, creatorId, fileToUpload) {
   if (!accompanimentData.url && !fileToUpload) {
@@ -98,8 +100,30 @@ export async function getAccompanimentAtId(id) {
   };
 }
 
-export async function getAccompanimentFileAtId(id, userId, res) {
-  // TODO if the user does not own the accompaniment they should not be able to see it
-  const accompaniment = await AccompanimentModel.findById(id);
-  getFileAndAddItToResponse(accompaniment.file, res);
+export async function getAccompanimentFileAtId(accompanimentId, token, res) {
+  const { id: userId } = decodeToken(token);
+
+  const { file } = await AccompanimentModel.findById(accompanimentId);
+  const { originalFileName, s3Key } = file;
+  let tokenIsValid;
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+    tokenIsValid = true;
+  } catch (e) {
+    tokenIsValid = false;
+  }
+
+  let userOwnsThis = false;
+  if (userId) {
+    const user = await UserModel.findById(userId).populate('accompanimentsOwned');
+    const { accompanimentsOwned } = await user.populate('accompanimentsOwned');
+    const accompanimentIds = accompanimentsOwned.map((acc) => acc.accompaniment.toString());
+    userOwnsThis = accompanimentIds.includes(accompanimentId.toString());
+  }
+
+  if (!token || !userId || !tokenIsValid || !userOwnsThis) {
+    getFileAndAddItToResponse(originalFileName, `${s3Key}-sample`, res);
+  } else {
+    getFileAndAddItToResponse(originalFileName, s3Key, res);
+  }
 }

@@ -4,19 +4,17 @@ import { getFileAndAddItToResponse, uploadFile } from './s3Helpers';
 
 describe('s3Helpers', () => {
   let mockUpload;
-  let tempFilePath;
 
-  beforeEach(() => {
-    tempFilePath = `\\tmp\\${Math.random().toString(36).slice(2)}`;
+  beforeEach(async () => {
     mockUpload = jest.spyOn(AWS.S3.prototype, 'upload');
     mockUpload.mockReturnValue({ promise: jest.fn() });
-    fs.copyFileSync('./utils/testMp3.mp3', tempFilePath);
-    // Will be deleted by uploadFile
   });
 
   describe('uploadFile', () => {
     it('should upload the file to s3 with its sample', async () => {
       // eslint-disable-next-line global-require
+      const tempFilePath = `\\tmp\\${Math.random().toString(36).slice(2)}`;
+      fs.copyFileSync('./utils/testMp3.mp3', tempFilePath);
       const file = { path: tempFilePath, filename: 'aNicefilename', mimetype: 'mp3' };
       await uploadFile(file);
       const expected = {
@@ -40,6 +38,8 @@ describe('s3Helpers', () => {
     });
 
     it('should delete the temporary file after running', async () => {
+      const tempFilePath = `\\tmp\\${Math.random().toString(36).slice(2)}`;
+      fs.copyFileSync('./utils/testMp3.mp3', tempFilePath);
       const file = { path: tempFilePath, filename: 'aNicefilename', mimetype: 'mp3' };
       await uploadFile(file);
       expect(fs.existsSync(tempFilePath)).toBeFalsy();
@@ -52,7 +52,7 @@ describe('s3Helpers', () => {
       const res = {
         attachment: jest.fn(), on: jest.fn(), once: jest.fn(), emit: jest.fn(),
       };
-      await getFileAndAddItToResponse(fileData, res);
+      await getFileAndAddItToResponse(fileData.originalFileName, fileData.s3Key, res);
       expect(res.on).toHaveBeenCalled();
       expect(res.emit).toHaveBeenCalled();
       expect(res.once).toHaveBeenCalled();
