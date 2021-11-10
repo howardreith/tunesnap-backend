@@ -1,6 +1,8 @@
 import AWS from 'aws-sdk';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import path from 'path';
+import createSampleFromAudioFile from './audioFileHelpers.js';
 
 dotenv.config();
 
@@ -14,16 +16,30 @@ const s3 = new AWS.S3({
 });
 
 export async function uploadFile(file) {
-  const stream = fs.createReadStream(file.path);
+  const fullFileStream = fs.createReadStream(file.path);
+  await createSampleFromAudioFile(fullFileStream, file.path);
+  const sample = fs.readFileSync(path.resolve(`${file.path}-sample`));
 
-  const params = {
+  const mainParams = {
     Bucket,
     Key: file.filename,
-    Body: stream,
+    Body: fullFileStream,
     ContentType: file.mimetype,
   };
 
-  return s3.upload(params).promise();
+  const sampleParams = {
+    Bucket,
+    Key: `${file.filename}-sample`,
+    Body: sample,
+    ContentType: file.mimetype,
+  };
+
+  await s3.upload(sampleParams).promise();
+  const mainResult = await s3.upload(mainParams).promise();
+  fs.unlinkSync(`${file.path}`);
+  fs.unlinkSync(`${file.path}-sample`);
+
+  return mainResult;
 }
 
 export function getFileAndAddItToResponse(fileData, res) {

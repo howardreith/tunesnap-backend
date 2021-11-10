@@ -1,24 +1,34 @@
 import AWS from 'aws-sdk';
+import fs from 'fs';
 import { getFileAndAddItToResponse, uploadFile } from './s3Helpers';
 
 describe('s3Helpers', () => {
   let mockUpload;
+  let tempFilePath;
 
   beforeEach(() => {
+    tempFilePath = `\\tmp\\${Math.random().toString(36).slice(2)}`;
     mockUpload = jest.spyOn(AWS.S3.prototype, 'upload');
     mockUpload.mockReturnValue({ promise: jest.fn() });
+    fs.copyFileSync('./utils/testMp3.mp3', tempFilePath);
+    // Will be deleted by uploadFile
   });
 
   describe('uploadFile', () => {
-    it('should upload the file to s3', async () => {
+    it('should upload the file to s3 with its sample', async () => {
       // eslint-disable-next-line global-require
-      const file = { path: '\\tmp\\dbfe4d05fe7ff846acf73ea416edeefe', filename: 'aNicefilename', mimetype: 'mp3' };
+      const file = { path: tempFilePath, filename: 'aNicefilename', mimetype: 'mp3' };
       await uploadFile(file);
       const expected = {
         Key: 'aNicefilename',
         Bucket: 'media.tunesnap',
       };
+      const expectedSample = {
+        Key: 'aNicefilename-sample',
+        Bucket: 'media.tunesnap',
+      };
       expect(mockUpload).toHaveBeenCalledWith(expect.objectContaining(expected));
+      expect(mockUpload).toHaveBeenCalledWith(expect.objectContaining(expectedSample));
       // Not going to test a return value as that would basically be testing my mock,
       // but it should look like the following:
       //   const expected = {
@@ -27,6 +37,12 @@ describe('s3Helpers', () => {
       //     Key: 'aNicefilename',
       //     Bucket: 'media.tunesnap',
       //   };
+    });
+
+    it('should delete the temporary file after running', async () => {
+      const file = { path: tempFilePath, filename: 'aNicefilename', mimetype: 'mp3' };
+      await uploadFile(file);
+      expect(fs.existsSync(tempFilePath)).toBeFalsy();
     });
   });
 
