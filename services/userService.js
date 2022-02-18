@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import UserModel from '../models/userModel.js';
 import { generateToken } from '../utils/authHelpers.js';
 
@@ -24,6 +24,26 @@ export async function loginUser(email, password) {
       token,
     };
   }
+}
+
+export async function getUserInfo(id) {
+  if (!id) {
+    throw Error('ID is required');
+  }
+  const user = await UserModel.findById({_id: id});
+  if (!user) {
+    throw Error('User not found');
+  }
+  return {
+    _id: user.id,
+    email: user.email,
+    displayName: user.displayName,
+    accompanimentSubmissions: user.accompanimentSubmissions,
+    favoriteSongs: user.favoriteSongs,
+    favoriteAccompaniments: user.favoriteAccompaniments,
+    cart: user.cart,
+    accompanimentsOwned: user.accompanimentsOwned,
+  };
 }
 
 export async function registerUser(email, password, displayName) {

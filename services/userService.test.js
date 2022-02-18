@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { clearDatabase, connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers';
 import UserModel from '../models/userModel';
@@ -8,7 +8,7 @@ import {
   updatePassword,
   addAccompanimentToCart,
   getCart,
-  removeAccompanimentFromCart,
+  removeAccompanimentFromCart, getUserInfo,
 } from './userService';
 import SongModel from '../models/songModel';
 import { createAccompaniment } from './accompanimentService';
@@ -129,6 +129,31 @@ describe('userService', () => {
       expect(result.token).toBeTruthy();
       const decoded = jwt.decode(result.token);
       expect(decoded.id).toEqual(savedStockUser._id.toString());
+    });
+  });
+
+  describe('getUserInfo', () => {
+    it('should throw without an id', async () => {
+      await expect(getUserInfo()).rejects.toThrowError('ID is required');
+    });
+
+    it('should throw if user not found', async () => {
+      await expect(getUserInfo('6215150ffadb1b70464f03f0')).rejects.toThrowError('User not found');
+    });
+
+    it('should return the user info', async () => {
+      const result = await getUserInfo(savedStockUser._id);
+      const expected = {
+        _id: savedStockUser._id.toString(),
+        accompanimentSubmissions: [],
+        accompanimentsOwned: [],
+        cart: [],
+        displayName: savedStockUser.displayName,
+        email: savedStockUser.email,
+        favoriteAccompaniments: [],
+        favoriteSongs: [],
+      };
+      expect(result).toEqual(expected);
     });
   });
 

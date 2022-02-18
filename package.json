@@ -5,13 +5,13 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules --experimental-json-modules ./node_modules/jest/bin/jest.js --runInBand",
+    "test": "node --experimental-vm-modules --experimental-json-modules ./node_modules/jest/bin/jest.js --runInBand --config=./jest.config.js",
     "start": "node index.js"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "aws-sdk": "^2.1020.0",
-    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
@@ -34,7 +34,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^1.7.0",
-    "jest": "^27.3.1",
+    "jest": "^27.5.1",
     "jest-esm-transformer": "^1.0.0",
     "@shelf/jest-mongodb": "^2.1.0",
     "jest-when": "^3.4.1"
