@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const purchaseSchema = new mongoose.Schema({
+export const accompanimentsOwnedSchema = new mongoose.Schema({
   accompaniment: { type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment', required: true },
   pricePaid: { type: Number, required: true },
   currency: { type: String, required: true },
@@ -16,7 +16,8 @@ const userModel = new mongoose.Schema({
   displayName: { type: String, required: true },
   dateJoined: { type: Date, required: true },
   accompanimentSubmissions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
-  accompanimentsOwned: [{ type: purchaseSchema }],
+  accompanimentsOwned: [{ type: accompanimentsOwnedSchema }],
+  purchases: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Sale' }],
   favoriteSongs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Song' }],
   favoriteAccompaniments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
   cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
