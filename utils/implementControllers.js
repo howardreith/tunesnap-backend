@@ -11,7 +11,8 @@ import getAccompanimentFileByIdController from '../controllers/accompaniment/get
 import addAccompanimentToCartController from '../controllers/user/addAccompanimentToCartController.js';
 import getCartController from '../controllers/user/getCartController.js';
 import removeAccompanimentFromCartController from '../controllers/user/removeAccompanimentFromCartController.js';
-import getUserInfoController from "../controllers/user/getUserInfoController.js";
+import getUserInfoController from '../controllers/user/getUserInfoController.js';
+import addSaleController from '../controllers/sale/addSaleController.js';
 // import seedDatabaseController from '../controllers/admin/seedDatabaseController.js';
 // import getSongTitlesController from '../controllers/admin/getSongTitlesController.js';
 // import pruneSongsController from '../controllers/admin/pruneSongsController.js';
@@ -36,6 +37,9 @@ export default function implementControllers(app) {
   createSongController(app);
   getAllSongsController(app);
   autocompleteController(app);
+
+  // Sale Controllers
+  addSaleController(app);
 
   // Admin Controllers
   // seedDatabaseController(app);

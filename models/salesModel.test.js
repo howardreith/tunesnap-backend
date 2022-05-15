@@ -64,7 +64,6 @@ describe('SalesModel', () => {
 
     salesData = {
       purchaserId: buyerUser._id,
-      sellerId: sellerUser._id,
       accompanimentsSold: [{
         accompaniment: savedAccompaniment._id,
         pricePaid: 1,

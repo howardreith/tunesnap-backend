@@ -3,7 +3,6 @@ import { accompanimentsOwnedSchema } from './userModel.js';
 
 const saleModel = new mongoose.Schema({
   purchaserId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
-  sellerId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
   accompanimentsSold: [{ type: accompanimentsOwnedSchema }],
   dateCreated: { type: Date, required: true },
   paypalOrderId: String,
