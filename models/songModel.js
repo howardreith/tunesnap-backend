@@ -9,6 +9,8 @@ const songModel = new mongoose.Schema({
   songCycle: { type: String, required: false },
   songCycleIndex: { type: String, required: false },
   textAndTranslation: { type: String, required: false },
+  role: { type: String, required: false },
+  fach: { type: String, required: false },
   accompaniments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
 }, { collection: 'songs' });
 // eslint-disable-next-line new-cap
