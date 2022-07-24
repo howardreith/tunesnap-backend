@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
 import {
-  createSong, getSongAtId, getAllSongs, getSongViaAutocomplete,
+  createSong, getSongAtId, getAllSongs, getSongViaAutocomplete, addAccompanimentRequestForSong,
 } from './songService.js';
 // Import this so accompaniment model is added and song model can use it
 // eslint-disable-next-line no-unused-vars
 import AccompanimentModel from '../models/accompanimentModel.js';
 import SongModel from '../models/songModel.js';
 import { connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers.js';
+import UserModel from '../models/userModel.js';
 
 describe('songService', () => {
   beforeAll(async () => {
@@ -81,7 +82,10 @@ describe('songService', () => {
         page: 0,
       };
       const result = await getSongViaAutocomplete(input);
-      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkonig' })] });
+      expect(result).toEqual({
+        numberOfSongs: 1,
+        songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkonig' })],
+      });
     });
 
     it('should return all songs that match the value despite accents', async () => {
@@ -99,7 +103,10 @@ describe('songService', () => {
         page: 0,
       };
       const result = await getSongViaAutocomplete(input, true);
-      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkönig' })] });
+      expect(result).toEqual({
+        numberOfSongs: 1,
+        songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkönig' })],
+      });
     });
 
     it('should return all songs that match the composer', async () => {
@@ -117,7 +124,10 @@ describe('songService', () => {
         page: 0,
       };
       const result = await getSongViaAutocomplete(input, true);
-      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })] });
+      expect(result).toEqual({
+        numberOfSongs: 1,
+        songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })],
+      });
     });
 
     it('should filter by both composer and title', async () => {
@@ -138,7 +148,10 @@ describe('songService', () => {
         page: 0,
       };
       const result = await getSongViaAutocomplete(input, true);
-      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkönig' })] });
+      expect(result).toEqual({
+        numberOfSongs: 1,
+        songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Erlkönig' })],
+      });
     });
 
     it('should filter by song cycle', async () => {
@@ -159,7 +172,10 @@ describe('songService', () => {
         page: 0,
       };
       const result = await getSongViaAutocomplete(input, true);
-      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })] });
+      expect(result).toEqual({
+        numberOfSongs: 1,
+        songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })],
+      });
     });
 
     it('should filter by song cycle, composer, and title', async () => {
@@ -180,7 +196,10 @@ describe('songService', () => {
         page: 0,
       };
       const result = await getSongViaAutocomplete(input, true);
-      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })] });
+      expect(result).toEqual({
+        numberOfSongs: 1,
+        songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })],
+      });
     });
 
     it('should filter by song cycle, and composere', async () => {
@@ -201,7 +220,43 @@ describe('songService', () => {
         page: 0,
       };
       const result = await getSongViaAutocomplete(input, true);
-      expect(result).toEqual({ numberOfSongs: 1, songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })] });
+      expect(result).toEqual({
+        numberOfSongs: 1,
+        songs: [expect.objectContaining({ composer: 'Franz Schubert', title: 'Der Lindenbaum' })],
+      });
+    });
+  });
+
+  describe('addAccompanimentRequestForSong', () => {
+    let savedSong;
+    let savedUser;
+    beforeEach(async () => {
+      const userData = {
+        email: 'david@gnome.com',
+        password: 'anEncryptedPassword',
+        displayName: 'David The Gnome',
+        dateJoined: new Date(),
+      };
+      const validUser = new UserModel(userData);
+      savedUser = await validUser.save();
+      const songData = {
+        title: 'Erlkonig',
+        composer: 'Franz Schubert',
+        accompaniments: [],
+      };
+      const validSong = new SongModel(songData);
+      savedSong = await validSong.save();
+    });
+
+    it('successfully adds an accompaniment request for a song', async () => {
+      const result = await addAccompanimentRequestForSong({ id: savedSong.id }, savedUser.id);
+      const expected = savedSong.id.toString();
+      expect(result[0].toString()).toEqual(expected);
+      const updatedUser = await UserModel.findById(savedUser.id);
+      expect(updatedUser.requestedAccompaniments[0].toString()).toEqual(expected);
+      const updatedSong = await SongModel.findById(savedSong.id);
+      const expectedSongData = savedUser.id.toString();
+      expect(updatedSong.accompanimentRequests[0].toString()).toEqual(expectedSongData);
     });
   });
 });

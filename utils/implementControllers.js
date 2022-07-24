@@ -37,6 +37,7 @@ export default function implementControllers(app) {
   createSongController(app);
   getAllSongsController(app);
   autocompleteController(app);
+  addAccompanimentToSongController(app);
 
   // Sale Controllers
   addSaleController(app);

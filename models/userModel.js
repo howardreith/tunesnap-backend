@@ -21,6 +21,7 @@ const userModel = new mongoose.Schema({
   favoriteSongs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Song' }],
   favoriteAccompaniments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
   cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
+  requestedAccompaniments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Song'}]
 }, { collection: 'users' });
 // eslint-disable-next-line new-cap
 const UserModel = new mongoose.model('User', userModel);

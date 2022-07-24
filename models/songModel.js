@@ -12,6 +12,7 @@ const songModel = new mongoose.Schema({
   role: { type: String, required: false },
   fach: { type: String, required: false },
   accompaniments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Accompaniment' }],
+  accompanimentRequests: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
 }, { collection: 'songs' });
 // eslint-disable-next-line new-cap
 const SongModel = new mongoose.model('Song', songModel);

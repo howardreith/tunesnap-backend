@@ -1,5 +1,6 @@
 import SongModel from '../models/songModel.js';
 import { getAndSortSongsAccordingToParam } from '../utils/songHelpers.js';
+import UserModel from '../models/userModel.js';
 
 export async function createSong(song) {
   const songData = { ...song };
@@ -49,9 +50,32 @@ export async function getSongViaAutocomplete({
   return { songs: pageOfMatches, numberOfSongs: matchesArray.length };
 }
 
+export async function addAccompanimentRequestForSong(songData, userId) {
+  const { id: songId } = songData;
+  const song = await SongModel.findById(songId);
+  const user = await UserModel.findById(userId);
+
+  const accompanimentRequests = [...song.accompanimentRequests];
+  const requestedAccompaniments = [...user.requestedAccompaniments];
+  accompanimentRequests.push(user.id);
+  requestedAccompaniments.push(song.id);
+
+  await SongModel.findByIdAndUpdate(
+    song.id,
+    { accompanimentRequests },
+  );
+  await UserModel.findByIdAndUpdate(
+    user.id,
+    { requestedAccompaniments },
+  );
+
+  return (await UserModel.findById(user.id)).requestedAccompaniments;
+}
+
 export default {
   createSong,
   getAllSongs,
   getSongAtId,
   getSongViaAutocomplete,
+  addAccompanimentRequestForSong
 };

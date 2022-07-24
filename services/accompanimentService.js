@@ -48,8 +48,10 @@ export async function createAccompaniment(accompanimentData, creatorId, fileToUp
 
   let user = await UserModel.findById(creatorId);
   const userAccompanimentSubmissions = [...user.accompanimentSubmissions, savedAccompaniment._id];
-  await UserModel.findByIdAndUpdate(creatorId,
-    { accompanimentSubmissions: userAccompanimentSubmissions });
+  await UserModel.findByIdAndUpdate(
+    creatorId,
+    { accompanimentSubmissions: userAccompanimentSubmissions },
+  );
   if (fileToUpload) {
     const dataToAddToOwnedAccompaniments = {
       accompaniment: savedAccompaniment._id,
@@ -58,8 +60,10 @@ export async function createAccompaniment(accompanimentData, creatorId, fileToUp
       dateOfPurchase: new Date(),
     };
     const userOwnedAccompaniments = [...user.accompanimentsOwned, dataToAddToOwnedAccompaniments];
-    await UserModel.findByIdAndUpdate(creatorId,
-      { accompanimentsOwned: userOwnedAccompaniments });
+    await UserModel.findByIdAndUpdate(
+      creatorId,
+      { accompanimentsOwned: userOwnedAccompaniments },
+    );
     user = await UserModel.findById(creatorId);
   }
 

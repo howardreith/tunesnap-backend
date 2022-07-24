@@ -151,6 +151,7 @@ describe('userService', () => {
         displayName: savedStockUser.displayName,
         email: savedStockUser.email,
         favoriteAccompaniments: [],
+        requestedAccompaniments: [],
         favoriteSongs: [],
       };
       expect(result).toEqual(expected);

@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules --experimental-json-modules ./node_modules/jest/bin/jest.js --runInBand --config=./jest.config.js",
+    "test": "node --experimental-vm-modules --experimental-json-modules ./node_modules/jest/bin/jest.js --runInBand --config=./jest.cli.config.js",
     "start": "node --experimental-json-modules index.js"
   },
   "dependencies": {

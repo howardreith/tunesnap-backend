@@ -12,7 +12,7 @@ export async function connectToInMemoryDb() {
 
 export async function disconnectFromInMemoryDb() {
   await mongoose.connect.dropDatabase();
-  await mongoose.connection.close();
+  await mongoose.disconnect();
 }
 
 export async function clearDatabase() {

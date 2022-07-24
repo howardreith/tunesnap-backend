@@ -21,6 +21,7 @@ export async function loginUser(email, password) {
       favoriteAccompaniments: user.favoriteAccompaniments,
       cart: user.cart,
       accompanimentsOwned: user.accompanimentsOwned,
+      requestedAccompaniments: user.requestedAccompaniments,
       token,
     };
   }
@@ -43,6 +44,7 @@ export async function getUserInfo(id) {
     favoriteAccompaniments: user.favoriteAccompaniments,
     cart: user.cart,
     accompanimentsOwned: user.accompanimentsOwned,
+    requestedAccompaniments: user.requestedAccompaniments,
   };
 }
 
