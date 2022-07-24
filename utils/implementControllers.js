@@ -13,6 +13,7 @@ import getCartController from '../controllers/user/getCartController.js';
 import removeAccompanimentFromCartController from '../controllers/user/removeAccompanimentFromCartController.js';
 import getUserInfoController from '../controllers/user/getUserInfoController.js';
 import addSaleController from '../controllers/sale/addSaleController.js';
+import addAccompanimentRequestForSongController from '../controllers/song/addAccompanimentRequestForSongController.js';
 // import getSongTitlesController from '../controllers/admin/getSongTitlesController.js';
 // import pruneSongsController from '../controllers/admin/pruneSongsController.js';
 // import seedAriasController from '../controllers/admin/seedAriasController.js';
@@ -37,7 +38,7 @@ export default function implementControllers(app) {
   createSongController(app);
   getAllSongsController(app);
   autocompleteController(app);
-  addAccompanimentToSongController(app);
+  addAccompanimentRequestForSongController(app);
 
   // Sale Controllers
   addSaleController(app);
