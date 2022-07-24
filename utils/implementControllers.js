@@ -14,6 +14,8 @@ import removeAccompanimentFromCartController from '../controllers/user/removeAcc
 import getUserInfoController from '../controllers/user/getUserInfoController.js';
 import addSaleController from '../controllers/sale/addSaleController.js';
 import addAccompanimentRequestForSongController from '../controllers/song/addAccompanimentRequestForSongController.js';
+import deleteAccompanimentRequestForSongController
+  from '../controllers/song/deleteAccompanimentRequestForSongController.js';
 // import getSongTitlesController from '../controllers/admin/getSongTitlesController.js';
 // import pruneSongsController from '../controllers/admin/pruneSongsController.js';
 // import seedAriasController from '../controllers/admin/seedAriasController.js';
@@ -39,6 +41,7 @@ export default function implementControllers(app) {
   getAllSongsController(app);
   autocompleteController(app);
   addAccompanimentRequestForSongController(app);
+  deleteAccompanimentRequestForSongController(app);
 
   // Sale Controllers
   addSaleController(app);

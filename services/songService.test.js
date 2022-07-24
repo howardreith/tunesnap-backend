@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 import {
-  createSong, getSongAtId, getAllSongs, getSongViaAutocomplete, addAccompanimentRequestForSong,
+  createSong,
+  getSongAtId,
+  getAllSongs,
+  getSongViaAutocomplete,
+  addAccompanimentRequestForSong,
+  deleteAccompanimentRequestForSong,
 } from './songService.js';
 // Import this so accompaniment model is added and song model can use it
 // eslint-disable-next-line no-unused-vars
@@ -257,6 +262,50 @@ describe('songService', () => {
       const updatedSong = await SongModel.findById(savedSong.id);
       const expectedSongData = savedUser.id.toString();
       expect(updatedSong.accompanimentRequests[0].toString()).toEqual(expectedSongData);
+    });
+  });
+
+  describe('deleteAccompanimentRequestForSong', () => {
+    let savedSong;
+    let savedUser;
+    beforeEach(async () => {
+      const userData = {
+        email: 'david@gnome.com',
+        password: 'anEncryptedPassword',
+        displayName: 'David The Gnome',
+        dateJoined: new Date(),
+      };
+      const validUser = new UserModel(userData);
+      savedUser = await validUser.save();
+      const songData = {
+        title: 'Erlkonig',
+        composer: 'Franz Schubert',
+        accompaniments: [],
+      };
+      const validSong = new SongModel(songData);
+      savedSong = await validSong.save();
+
+      await SongModel.findByIdAndUpdate(
+        savedSong.id,
+        { accompanimentRequests: [savedUser.id] },
+      );
+      await UserModel.findByIdAndUpdate(
+        savedUser.id,
+        { requestedAccompaniments: [savedSong.id] },
+      );
+    });
+
+    it('successfully removes an accompaniment request from a song', async () => {
+      const initialUser = await UserModel.findById(savedUser.id);
+      expect(initialUser.requestedAccompaniments.length).toEqual(1);
+      const initialSong = await SongModel.findById(savedSong.id);
+      expect(initialSong.accompanimentRequests.length).toEqual(1);
+      const result = await deleteAccompanimentRequestForSong({ id: savedSong.id }, savedUser.id);
+      expect(result).toEqual([]);
+      const updatedUser = await UserModel.findById(savedUser.id);
+      expect(updatedUser.requestedAccompaniments).toEqual([]);
+      const updatedSong = await SongModel.findById(savedSong.id);
+      expect(updatedSong.accompanimentRequests).toEqual([]);
     });
   });
 });
