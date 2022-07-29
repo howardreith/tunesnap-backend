@@ -57,8 +57,8 @@ export async function addAccompanimentRequestForSong(songData, userId) {
 
   const accompanimentRequests = [...song.accompanimentRequests];
   const requestedAccompaniments = [...user.requestedAccompaniments];
-  accompanimentRequests.push(user.id);
-  requestedAccompaniments.push(song.id);
+  accompanimentRequests.push({ userId: user.id, dateCreated: new Date() });
+  requestedAccompaniments.push({ songId: song.id, dateCreated: new Date() });
 
   await SongModel.findByIdAndUpdate(
     song.id,
@@ -80,10 +80,12 @@ export async function deleteAccompanimentRequestForSong(songData, userId) {
   const accompanimentRequests = [...song.accompanimentRequests];
   const requestedAccompaniments = [...user.requestedAccompaniments];
 
-  const accompanimentRequestIndex = accompanimentRequests.indexOf(user.id);
+  const accompanimentRequestIndex = accompanimentRequests
+    .findIndex((acc) => acc.userId.toString() === user.id.toString());
   accompanimentRequests.splice(accompanimentRequestIndex, 1);
 
-  const requestedAccompanimentIndex = requestedAccompaniments.indexOf(song.id);
+  const requestedAccompanimentIndex = requestedAccompaniments
+    .findIndex((acc) => acc.songId.toString() === song.id.toString());
   requestedAccompaniments.splice(requestedAccompanimentIndex, 1); // 2nd p
 
   await SongModel.findByIdAndUpdate(

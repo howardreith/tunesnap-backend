@@ -256,12 +256,12 @@ describe('songService', () => {
     it('successfully adds an accompaniment request for a song', async () => {
       const result = await addAccompanimentRequestForSong({ id: savedSong.id }, savedUser.id);
       const expected = savedSong.id.toString();
-      expect(result[0].toString()).toEqual(expected);
+      expect(result[0].id.toString()).toEqual(expected);
       const updatedUser = await UserModel.findById(savedUser.id);
-      expect(updatedUser.requestedAccompaniments[0].toString()).toEqual(expected);
+      expect(updatedUser.requestedAccompaniments[0].id.toString()).toEqual(expected);
       const updatedSong = await SongModel.findById(savedSong.id);
       const expectedSongData = savedUser.id.toString();
-      expect(updatedSong.accompanimentRequests[0].toString()).toEqual(expectedSongData);
+      expect(updatedSong.accompanimentRequests[0].id.toString()).toEqual(expectedSongData);
     });
   });
 
@@ -287,11 +287,11 @@ describe('songService', () => {
 
       await SongModel.findByIdAndUpdate(
         savedSong.id,
-        { accompanimentRequests: [savedUser.id] },
+        { accompanimentRequests: [{ userId: savedUser.id, dateCreated: new Date() }] },
       );
       await UserModel.findByIdAndUpdate(
         savedUser.id,
-        { requestedAccompaniments: [savedSong.id] },
+        { requestedAccompaniments: [{ songId: savedSong.id, dateCreated: new Date() }] },
       );
     });
 
