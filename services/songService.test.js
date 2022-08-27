@@ -403,6 +403,14 @@ describe('songService', () => {
       expect(result.totalLength).toEqual(2);
     });
 
+    it('returns the songs sorted by recency when that prop is true', async () => {
+      const result = await getSongsSortedByNumberOfRequests(1, true);
+      const resultSongIds = result.accompanimentRequestsPage.map((song) => song._id.toString());
+      expect(resultSongIds.includes(savedSong3._id.toString())).toBeFalsy();
+      expect(resultSongIds[0]).toEqual(savedSong2._id.toString());
+      expect(resultSongIds[1]).toEqual(savedSong._id.toString());
+    });
+
     describe('pagination', () => {
       let tempSong9;
       beforeEach(async () => {

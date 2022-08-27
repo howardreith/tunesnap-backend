@@ -1,4 +1,4 @@
-import { SORT_OPTIONS, getAndSortSongsAccordingToParam } from './songHelpers';
+import { SORT_OPTIONS, getAndSortSongsAccordingToParam, sortSongsByMostRecentAccompanimentRequest } from './songHelpers';
 import { clearDatabase, connectToInMemoryDb, disconnectFromInMemoryDb } from './testHelpers';
 import SongModel from '../models/songModel';
 
@@ -127,6 +127,64 @@ describe('songHelpers', () => {
           expect.objectContaining(song3),
           expect.objectContaining(song1),
         ]);
+    });
+  });
+
+  describe('sortSongsByMostRecentAccompanimentRequest', () => {
+    it('sorts by the most recent requests', () => {
+      const songs = [{
+        _id: '630a62bd6fcd0d221d7bb7a0',
+        title: 'Erlkonig',
+        composer: 'Franz Schubert',
+        accompaniments: [],
+        accompanimentRequests: [
+          {
+            userId: '630a62bd6fcd0d221d7bb79b',
+            dateCreated: '2022-08-27T18:30:21.121Z',
+            _id: '630a62bd6fcd0d221d7bb7a6',
+          }, {
+            userId: '630a62bd6fcd0d221d7bb79e',
+            dateCreated: '2022-07-27T18:30:21.121Z',
+            _id: '630a62bd6fcd0d221d7bb7a7',
+          }],
+        __v: 0,
+      }, {
+        _id: '630a62bd6fcd0d221d7bb7a0',
+        title: 'Der Leiermann',
+        composer: 'Franz Schubert',
+        accompaniments: [],
+        accompanimentRequests: [
+          {
+            userId: '630a62bd6fcd0d221d7bb79b',
+            dateCreated: '2022-08-29T18:30:21.121Z',
+            _id: '630a62bd6fcd0d221d7bb7a6',
+          }, {
+            userId: '630a62bd6fcd0d221d7bb79e',
+            dateCreated: '2022-07-24T18:30:21.121Z',
+            _id: '630a62bd6fcd0d221d7bb7a7',
+          }],
+        __v: 0,
+      }, {
+        _id: '630a62bd6fcd0d221d7bb7a2',
+        title: 'Der Lindenbaum',
+        composer: 'Franz Schubert',
+        accompaniments: [],
+        accompanimentRequests: [
+          {
+            userId: '630a62bd6fcd0d221d7bb79b',
+            dateCreated: '2022-08-30T18:30:21.130Z',
+            _id: '630a62bd6fcd0d221d7bb7a9',
+          },
+        ],
+        __v: 0,
+      }];
+      const clonedSong1 = { ...songs[0] };
+      const clonedSong2 = { ...songs[1] };
+      const clonedSong3 = { ...songs[2] };
+      const clonedSongs = [clonedSong1, clonedSong2, clonedSong3];
+      sortSongsByMostRecentAccompanimentRequest(clonedSongs);
+      const expected = [songs[2], songs[1], songs[0]];
+      expect(clonedSongs).toEqual(expected);
     });
   });
 });

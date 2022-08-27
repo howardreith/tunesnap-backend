@@ -108,3 +108,16 @@ export async function getAndSortSongsAccordingToParam(sortBy, clearCache) {
       return sortedSongArrays.songsSortedByTitle;
   }
 }
+
+export function sortSongsByMostRecentAccompanimentRequest(songsWithRequests) {
+  return songsWithRequests.sort((a, b) => new Date(
+    b.accompanimentRequests
+      .sort((c, d) => new Date(new Date(d.dateCreated) - new Date(c.dateCreated)))[0]
+      .dateCreated,
+  )
+    - new Date(
+      a.accompanimentRequests
+        .sort((c, d) => new Date(new Date(d.dateCreated) - new Date(c.dateCreated)))[0]
+        .dateCreated,
+    ));
+}
