@@ -6,6 +6,7 @@ import {
   getSongViaAutocomplete,
   addAccompanimentRequestForSong,
   deleteAccompanimentRequestForSong,
+  getSongsSortedByNumberOfRequests,
 } from './songService.js';
 // Import this so accompaniment model is added and song model can use it
 // eslint-disable-next-line no-unused-vars
@@ -256,12 +257,12 @@ describe('songService', () => {
     it('successfully adds an accompaniment request for a song', async () => {
       const result = await addAccompanimentRequestForSong({ id: savedSong.id }, savedUser.id);
       const expected = savedSong.id.toString();
-      expect(result[0].id.toString()).toEqual(expected);
+      expect(result[0].songId.toString()).toEqual(expected);
       const updatedUser = await UserModel.findById(savedUser.id);
-      expect(updatedUser.requestedAccompaniments[0].id.toString()).toEqual(expected);
+      expect(updatedUser.requestedAccompaniments[0].songId.toString()).toEqual(expected);
       const updatedSong = await SongModel.findById(savedSong.id);
       const expectedSongData = savedUser.id.toString();
-      expect(updatedSong.accompanimentRequests[0].id.toString()).toEqual(expectedSongData);
+      expect(updatedSong.accompanimentRequests[0].userId.toString()).toEqual(expectedSongData);
     });
   });
 
@@ -306,6 +307,187 @@ describe('songService', () => {
       expect(updatedUser.requestedAccompaniments).toEqual([]);
       const updatedSong = await SongModel.findById(savedSong.id);
       expect(updatedSong.accompanimentRequests).toEqual([]);
+    });
+  });
+
+  describe('getSongsByNumberOfRequests', () => {
+    let savedUser;
+    let savedSong;
+    let savedSong2;
+    let savedSong3;
+    const userData = {
+      email: 'david@gnome.com',
+      password: 'anEncryptedPassword',
+      displayName: 'David The Gnome',
+      dateJoined: new Date(),
+    };
+    let validUser;
+    const songData = {
+      title: 'Erlkonig',
+      composer: 'Franz Schubert',
+      accompaniments: [],
+    };
+    let validSong;
+    beforeEach(async () => {
+      validUser = new UserModel(userData);
+      savedUser = await validUser.save();
+      const validUser2 = new UserModel({
+        email: 'lisa@gnome.com',
+        password: 'anEncryptedPassword',
+        displayName: 'Lisa The Gnome',
+        dateJoined: new Date(),
+      });
+      const savedUser2 = await validUser2.save();
+      const validUser3 = new UserModel({
+        email: 'swift@fox.com',
+        password: 'anEncryptedPassword',
+        displayName: 'Swift The Fox',
+        dateJoined: new Date(),
+      });
+      const savedUser3 = await validUser3.save();
+      validSong = new SongModel(songData);
+      savedSong = await validSong.save();
+      const validSong2 = new SongModel({
+        title: 'Der Lindenbaum',
+        composer: 'Franz Schubert',
+        accompaniments: [],
+      });
+      savedSong2 = await validSong2.save();
+      const validSong3 = new SongModel({
+        title: 'Der Leiermann',
+        composer: 'Franz Schubert',
+        accompaniments: [],
+      });
+      savedSong3 = await validSong3.save();
+      await SongModel.findByIdAndUpdate(
+        savedSong.id,
+        {
+          accompanimentRequests: [
+            { userId: savedUser2.id, dateCreated: new Date() },
+            { userId: savedUser3.id, dateCreated: new Date() },
+          ],
+        },
+      );
+      await SongModel.findByIdAndUpdate(
+        savedSong2.id,
+        {
+          accompanimentRequests: [
+            { userId: savedUser2.id, dateCreated: new Date() },
+          ],
+        },
+      );
+      await UserModel.findByIdAndUpdate(
+        savedUser2.id,
+        {
+          requestedAccompaniments: [
+            { songId: savedSong.id, dateCreated: new Date() },
+            { songId: savedSong2.id, dateCreated: new Date() }],
+        },
+      );
+      await UserModel.findByIdAndUpdate(
+        savedUser3.id,
+        { requestedAccompaniments: [{ songId: savedSong.id, dateCreated: new Date() }] },
+      );
+    });
+
+    it('returns songs sorted by number of accompaniment requests', async () => {
+      const result = await getSongsSortedByNumberOfRequests();
+      const resultSongIds = result.accompanimentRequestsPage.map((song) => song._id.toString());
+      expect(resultSongIds.includes(savedSong3._id.toString())).toBeFalsy();
+      expect(resultSongIds[0]).toEqual(savedSong._id.toString());
+      expect(resultSongIds[1]).toEqual(savedSong2._id.toString());
+    });
+
+    it('returns the total length of the songs that have requests', async () => {
+      const result = await getSongsSortedByNumberOfRequests();
+      expect(result.totalLength).toEqual(2);
+    });
+
+    describe('pagination', () => {
+      let tempSong9;
+      beforeEach(async () => {
+        const tempSong1 = await new SongModel({
+          title: 'blah1',
+          composer: 'Franz Schubert',
+          accompaniments: [],
+        }).save();
+        const tempSong2 = await new SongModel({
+          title: 'blah2',
+          composer: 'Franz Schubert',
+          accompaniments: [],
+        }).save();
+        const tempSong3 = await new SongModel({
+          title: 'blah3',
+          composer: 'Franz Schubert',
+          accompaniments: [],
+        }).save();
+        const tempSong4 = await new SongModel({
+          title: 'blah4',
+          composer: 'Franz Schubert',
+          accompaniments: [],
+        }).save();
+        const tempSong5 = await new SongModel({
+          title: 'blah5',
+          composer: 'Franz Schubert',
+          accompaniments: [],
+        }).save();
+        const tempSong6 = await new SongModel({
+          title: 'blah6',
+          composer: 'Franz Schubert',
+          accompaniments: [],
+        }).save();
+        const tempSong7 = await new SongModel({
+          title: 'blah7',
+          composer: 'Franz Schubert',
+          accompaniments: [],
+        }).save();
+        const tempSong8 = await new SongModel({
+          title: 'blah8',
+          composer: 'Franz Schubert',
+          accompaniments: [],
+        }).save();
+        tempSong9 = await new SongModel({
+          title: 'blah9',
+          composer: 'Franz Schubert',
+          accompaniments: [],
+        }).save();
+        const tempSong10 = await new SongModel({
+          title: 'blah10',
+          composer: 'Franz Schubert',
+          accompaniments: [],
+        }).save();
+        await Promise.all(
+          [tempSong1, tempSong2, tempSong3, tempSong4, tempSong5,
+            tempSong6, tempSong7, tempSong8, tempSong9, tempSong10]
+            .map(async (song) => {
+              await SongModel.findByIdAndUpdate(
+                song.id,
+                {
+                  accompanimentRequests: [
+                    { userId: savedUser.id, dateCreated: new Date() },
+                  ],
+                },
+              );
+            }),
+        );
+      });
+      it('will be performed when variable not passed in', async () => {
+        const result = await getSongsSortedByNumberOfRequests();
+        expect(result.totalLength).toEqual(12);
+        expect(result.accompanimentRequestsPage.length).toEqual(10);
+        expect(result.accompanimentRequestsPage[0]._id.toString())
+          .toEqual(savedSong._id.toString());
+      });
+
+      it('will be performed when variable passed in', async () => {
+        const result = await getSongsSortedByNumberOfRequests(2);
+        expect(result.totalLength).toEqual(12);
+        expect(result.accompanimentRequestsPage.length).toEqual(2);
+        expect(result.accompanimentRequestsPage[0]._id.toString())
+          .not.toEqual(savedSong._id.toString());
+        expect(result.accompanimentRequestsPage[0]._id.toString())
+          .toEqual(tempSong9._id.toString());
+      });
     });
   });
 });

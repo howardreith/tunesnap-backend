@@ -52,6 +52,7 @@ export async function getSongViaAutocomplete({
 
 export async function addAccompanimentRequestForSong(songData, userId) {
   const { id: songId } = songData;
+
   const song = await SongModel.findById(songId);
   const user = await UserModel.findById(userId);
 
@@ -98,6 +99,19 @@ export async function deleteAccompanimentRequestForSong(songData, userId) {
   );
 
   return (await UserModel.findById(user.id)).requestedAccompaniments;
+}
+
+export async function getSongsSortedByNumberOfRequests(pageNumber = 1) {
+  const songsWithAccompanimentRequests = (await SongModel
+    .find({ 'accompanimentRequests.userId': { $exists: true } }))
+    .sort((a, b) => b.accompanimentRequests.length - a.accompanimentRequests.length);
+  const bottomOfRange = (pageNumber - 1) * 10;
+  const topOfRange = pageNumber * 10;
+  return {
+    accompanimentRequestsPage: songsWithAccompanimentRequests
+      .slice(bottomOfRange, topOfRange),
+    totalLength: songsWithAccompanimentRequests.length,
+  };
 }
 
 export default {
