@@ -23,20 +23,23 @@ export async function getAllSongs(filter = {}, limit = 10) {
 export async function getSongViaAutocomplete({
   titleSearchValue, composerSearchValue, songSetSearchValue, sortBy, page,
 }, clearCache = false) {
+  const trueTitleSearchValue = titleSearchValue || '';
+  const trueComposerSearchValue = composerSearchValue || '';
+  const trueSongSetSearchValue = songSetSearchValue || '';
   const songs = await getAndSortSongsAccordingToParam(sortBy, clearCache);
   const songIndexes = [];
   for (let i = 0; i < songs.length; i += 1) {
-    if ((songs[i].title.toLowerCase().includes(titleSearchValue.toLowerCase())
+    if ((songs[i].title.toLowerCase().includes(trueTitleSearchValue.toLowerCase())
       || songs[i].title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-        .includes(titleSearchValue.toLowerCase()))
-      && (songs[i].composer.toLowerCase().includes(composerSearchValue.toLowerCase())
+        .includes(trueTitleSearchValue.toLowerCase()))
+      && (songs[i].composer.toLowerCase().includes(trueComposerSearchValue.toLowerCase())
         || songs[i].composer.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-          .includes(composerSearchValue.toLowerCase()))
-      && (songSetSearchValue ? ((songs[i].songCycle
-        && songs[i].songCycle.toLowerCase().includes(songSetSearchValue.toLowerCase()))
+          .includes(trueComposerSearchValue.toLowerCase()))
+      && (trueSongSetSearchValue ? ((songs[i].songCycle
+        && songs[i].songCycle.toLowerCase().includes(trueSongSetSearchValue.toLowerCase()))
         || (songs[i].songCycle
           && songs[i].songCycle.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-            .includes(songSetSearchValue.toLowerCase()))) : true)) {
+            .includes(trueSongSetSearchValue.toLowerCase()))) : true)) {
       songIndexes.push(i);
     }
   }

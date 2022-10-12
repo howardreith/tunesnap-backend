@@ -11,7 +11,7 @@ export async function connectToInMemoryDb() {
 }
 
 export async function disconnectFromInMemoryDb() {
-  await mongoose.connect.dropDatabase();
+  await mongoose.connection.db.dropDatabase();
   await mongoose.disconnect();
 }
 

@@ -1,10 +1,10 @@
 import { getSongViaAutocomplete } from '../../services/songService.js';
 
 export default function autocompleteController(app) {
-  app.post('/songs/search', async (req, res) => {
+  app.get('/search', async (req, res) => {
     const {
       titleSearchValue, composerSearchValue, songSetSearchValue, sortBy, page,
-    } = req.body;
+    } = req.query;
     getSongViaAutocomplete({
       titleSearchValue, composerSearchValue, songSetSearchValue, sortBy, page,
     }).then((response) => {
