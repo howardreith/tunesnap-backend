@@ -1,7 +1,7 @@
 import SongModel from '../models/songModel.js';
 import {
   getAndSortSongsAccordingToParam,
-  getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest,
+  getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest, refreshCache,
 } from '../utils/songHelpers.js';
 import UserModel from '../models/userModel.js';
 

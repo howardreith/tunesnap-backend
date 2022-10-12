@@ -2,12 +2,6 @@ import schedule from 'node-schedule';
 import SongModel from '../models/songModel.js';
 
 let songs = [];
-schedule.scheduleJob('0 0 * * *', async () => {
-  songs = (await SongModel.find({}));
-  // eslint-disable-next-line no-console
-  console.info('Songs cache has been updated');
-});
-
 const sortedSongArrays = {
   songsSortedByTitle: [],
   songsSortedByTitleReverse: [],
@@ -16,6 +10,61 @@ const sortedSongArrays = {
   songsSortedBySongCycle: [],
   songsSortedBySongCycleReverse: [],
 };
+
+export function clearCache() {
+  songs = [];
+  Object.keys(sortedSongArrays).forEach((key) => {
+    sortedSongArrays[key] = [];
+  });
+}
+
+export async function refreshCache() {
+  songs = await SongModel.find({});
+  sortedSongArrays.songsSortedByComposerReverse = [...songs].sort((a, b) => {
+    const aNameSplit = a.composer.split(' ');
+    const bNameSplit = b.composer.split(' ');
+    const aLastName = aNameSplit[aNameSplit.length - 1];
+    const bLastName = bNameSplit[bNameSplit.length - 1];
+    if (aLastName < bLastName) { return 1; }
+    if (aLastName > bLastName) { return -1; }
+    return 0;
+  });
+  sortedSongArrays.songsSortedByComposer = [...songs].sort((a, b) => {
+    const aNameSplit = a.composer.split(' ');
+    const bNameSplit = b.composer.split(' ');
+    const aLastName = aNameSplit[aNameSplit.length - 1];
+    const bLastName = bNameSplit[bNameSplit.length - 1];
+    if (aLastName < bLastName) { return -1; }
+    if (aLastName > bLastName) { return 1; }
+    return 0;
+  });
+  sortedSongArrays.songsSortedBySongCycleReverse = [...songs].sort((a, b) => {
+    if (!a.songCycle || a.songCycle < b.songCycle) { return 1; }
+    if (!b.songCycle || a.songCycle > b.songCycle) { return -1; }
+    return 0;
+  });
+  sortedSongArrays.songsSortedBySongCycle = [...songs].sort((a, b) => {
+    if (!a.songCycle || a.songCycle < b.songCycle) { return -1; }
+    if (!b.songCycle || a.songCycle > b.songCycle) { return 1; }
+    return 0;
+  });
+  sortedSongArrays.songsSortedByTitleReverse = [...songs].sort((a, b) => {
+    if (a.title < b.title) { return 1; }
+    if (a.title > b.title) { return -1; }
+    return 0;
+  });
+  sortedSongArrays.songsSortedByTitle = [...songs].sort((a, b) => {
+    if (a.title < b.title) { return -1; }
+    if (a.title > b.title) { return 1; }
+    return 0;
+  });
+  // eslint-disable-next-line no-console
+  console.info('Songs cache has been updated');
+}
+
+schedule.scheduleJob('*/30 * * * *', async () => {
+  await refreshCache();
+});
 
 export const SORT_OPTIONS = {
   TITLE: 'title',
@@ -26,19 +75,12 @@ export const SORT_OPTIONS = {
   SONG_CYCLE_REVERSE: 'songCycleReverse',
 };
 
-export function clearCache() {
-  songs = [];
-  Object.keys(sortedSongArrays).forEach((key) => {
-    sortedSongArrays[key] = [];
-  });
-}
-
 export async function getAndSortSongsAccordingToParam(sortBy, clearTheCache) {
   if (clearTheCache) {
     clearCache();
   }
   if (!songs || songs.length === 0) {
-    songs = await SongModel.find({});
+    await refreshCache();
   }
   switch (sortBy) {
     case SORT_OPTIONS.COMPOSER_REVERSE:
@@ -115,7 +157,7 @@ export async function getAndSortSongsAccordingToParam(sortBy, clearTheCache) {
 
 export async function getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest(sort = false) {
   if (!songs || songs.length === 0) {
-    songs = await SongModel.find({});
+    await refreshCache();
   }
   const songsWithRequests = songs.filter((song) => song.accompanimentRequests
     && song.accompanimentRequests.length > 0);
