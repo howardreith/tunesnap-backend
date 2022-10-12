@@ -20,5 +20,6 @@ module.exports = {
   rules: {
     'import/extensions': 0,
     'no-underscore-dangle': 0,
+    'max-len': ["error", { "code": 140 }]
   },
 };

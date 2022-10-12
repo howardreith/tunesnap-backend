@@ -1,4 +1,8 @@
-import { SORT_OPTIONS, getAndSortSongsAccordingToParam, sortSongsByMostRecentAccompanimentRequest } from './songHelpers';
+import {
+  SORT_OPTIONS,
+  getAndSortSongsAccordingToParam,
+  getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest,
+} from './songHelpers';
 import { clearDatabase, connectToInMemoryDb, disconnectFromInMemoryDb } from './testHelpers';
 import SongModel from '../models/songModel';
 
@@ -130,44 +134,69 @@ describe('songHelpers', () => {
     });
   });
 
-  describe('sortSongsByMostRecentAccompanimentRequest', () => {
-    it('sorts by the most recent requests', () => {
-      const songs = [{
-        _id: '630a62bd6fcd0d221d7bb7a0',
-        title: 'Erlkonig',
-        composer: 'Franz Schubert',
+  describe('getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest', () => {
+    beforeAll(async () => {
+      await connectToInMemoryDb();
+    });
+
+    afterAll(async () => {
+      await disconnectFromInMemoryDb();
+    });
+
+    afterEach(async () => {
+      await clearDatabase();
+    });
+
+    let song1;
+    let song2;
+    let song3;
+    beforeEach(async () => {
+      song1 = {
+        title: 'Aardvark',
+        composer: 'Mark Markety',
+        lyricist: 'David Davidy',
+        opusNumber: 'op. 550',
+        songCycle: 'Yuppy Songs',
+        songCycleIndex: '1',
+        textAndTranslation: 'https://website.com',
         accompaniments: [],
         accompanimentRequests: [
           {
             userId: '630a62bd6fcd0d221d7bb79b',
             dateCreated: '2022-08-27T18:30:21.121Z',
-            _id: '630a62bd6fcd0d221d7bb7a6',
           }, {
             userId: '630a62bd6fcd0d221d7bb79e',
             dateCreated: '2022-07-27T18:30:21.121Z',
-            _id: '630a62bd6fcd0d221d7bb7a7',
           }],
-        __v: 0,
-      }, {
-        _id: '630a62bd6fcd0d221d7bb7a0',
-        title: 'Der Leiermann',
-        composer: 'Franz Schubert',
+      };
+      song2 = {
+        title: 'Tiger',
+        composer: 'Tim Timothy',
+        lyricist: 'Bob the Builder',
+        opusNumber: 'op. 22',
+        songCycle: 'Candy Canes',
+        songCycleIndex: '2',
+        textAndTranslation: 'https://website.com',
         accompaniments: [],
         accompanimentRequests: [
           {
             userId: '630a62bd6fcd0d221d7bb79b',
             dateCreated: '2022-08-29T18:30:21.121Z',
-            _id: '630a62bd6fcd0d221d7bb7a6',
           }, {
             userId: '630a62bd6fcd0d221d7bb79e',
             dateCreated: '2022-07-24T18:30:21.121Z',
-            _id: '630a62bd6fcd0d221d7bb7a7',
+          },
+          {
+            userId: '630a62bd6fcd0d221d7bb79f',
+            dateCreated: '2022-07-24T18:30:21.121Z',
           }],
-        __v: 0,
-      }, {
-        _id: '630a62bd6fcd0d221d7bb7a2',
-        title: 'Der Lindenbaum',
-        composer: 'Franz Schubert',
+      };
+      song3 = {
+        title: 'Elephant',
+        composer: 'Normal Person',
+        lyricist: 'Abnormal Person',
+        opusNumber: 'op. 6',
+        textAndTranslation: 'https://website.com',
         accompaniments: [],
         accompanimentRequests: [
           {
@@ -176,15 +205,29 @@ describe('songHelpers', () => {
             _id: '630a62bd6fcd0d221d7bb7a9',
           },
         ],
-        __v: 0,
-      }];
-      const clonedSong1 = { ...songs[0] };
-      const clonedSong2 = { ...songs[1] };
-      const clonedSong3 = { ...songs[2] };
-      const clonedSongs = [clonedSong1, clonedSong2, clonedSong3];
-      sortSongsByMostRecentAccompanimentRequest(clonedSongs);
-      const expected = [songs[2], songs[1], songs[0]];
-      expect(clonedSongs).toEqual(expected);
+      };
+      const song1toSave = new SongModel(song1);
+      const song2toSave = new SongModel(song2);
+      const song3toSave = new SongModel(song3);
+      await song1toSave.save();
+      await song2toSave.save();
+      await song3toSave.save();
+    });
+
+    it('sorts by the most recent requests when relevant param is true', async () => {
+      const result = await getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest(true);
+      const expected = [song3, song2, song1];
+      expected.forEach((song, i) => {
+        expect(song.title).toEqual(result[i].title);
+      });
+    });
+
+    it('sorts by quantity of requests when param is false', async () => {
+      const result = await getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest(false);
+      const expected = [song2, song1, song3];
+      expected.forEach((song, i) => {
+        expect(song.title).toEqual(result[i].title);
+      });
     });
   });
 });

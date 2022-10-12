@@ -14,6 +14,7 @@ import AccompanimentModel from '../models/accompanimentModel.js';
 import SongModel from '../models/songModel.js';
 import { connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers.js';
 import UserModel from '../models/userModel.js';
+import { clearCache } from '../utils/songHelpers.js';
 
 describe('songService', () => {
   beforeAll(async () => {
@@ -329,6 +330,7 @@ describe('songService', () => {
     };
     let validSong;
     beforeEach(async () => {
+      clearCache();
       validUser = new UserModel(userData);
       savedUser = await validUser.save();
       const validUser2 = new UserModel({
@@ -404,7 +406,7 @@ describe('songService', () => {
     });
 
     it('returns the songs sorted by recency when that prop is true', async () => {
-      const result = await getSongsSortedByNumberOfRequests(1, true);
+      const result = await getSongsSortedByNumberOfRequests({ page: 1 }, true);
       const resultSongIds = result.accompanimentRequestsPage.map((song) => song._id.toString());
       expect(resultSongIds.includes(savedSong3._id.toString())).toBeFalsy();
       expect(resultSongIds[0]).toEqual(savedSong2._id.toString());
@@ -488,7 +490,7 @@ describe('songService', () => {
       });
 
       it('will be performed when variable passed in', async () => {
-        const result = await getSongsSortedByNumberOfRequests(2);
+        const result = await getSongsSortedByNumberOfRequests({ page: 2 });
         expect(result.totalLength).toEqual(12);
         expect(result.accompanimentRequestsPage.length).toEqual(2);
         expect(result.accompanimentRequestsPage[0]._id.toString())

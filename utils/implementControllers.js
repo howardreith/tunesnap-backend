@@ -4,7 +4,7 @@ import addAccompanimentToSongController from '../controllers/accompaniment/addAc
 import getSongAtIdController from '../controllers/song/getSongAtIdController.js';
 import createSongController from '../controllers/song/createSongController.js';
 import getAllSongsController from '../controllers/song/getAllSongsController.js';
-import autocompleteController from '../controllers/song/autocompleteController.js';
+import searchSongsController from '../controllers/song/searchSongsController.js';
 import updatePasswordController from '../controllers/user/updatePasswordController.js';
 import getAccompanimentByIdController from '../controllers/accompaniment/getAccompanimentByIdController.js';
 import getAccompanimentFileByIdController from '../controllers/accompaniment/getAccompanimentFileByIdController.js';
@@ -16,6 +16,8 @@ import addSaleController from '../controllers/sale/addSaleController.js';
 import addAccompanimentRequestForSongController from '../controllers/song/addAccompanimentRequestForSongController.js';
 import deleteAccompanimentRequestForSongController
   from '../controllers/song/deleteAccompanimentRequestForSongController.js';
+import getSongsByAccompanimentRequestsController
+  from '../controllers/song/getSongsByAccompanimentRequestsController.js';
 // import getSongTitlesController from '../controllers/admin/getSongTitlesController.js';
 // import pruneSongsController from '../controllers/admin/pruneSongsController.js';
 // import seedAriasController from '../controllers/admin/seedAriasController.js';
@@ -39,9 +41,10 @@ export default function implementControllers(app) {
   getSongAtIdController(app);
   createSongController(app);
   getAllSongsController(app);
-  autocompleteController(app);
+  searchSongsController(app);
   addAccompanimentRequestForSongController(app);
   deleteAccompanimentRequestForSongController(app);
+  getSongsByAccompanimentRequestsController(app);
 
   // Sale Controllers
   addSaleController(app);

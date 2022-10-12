@@ -1,6 +1,6 @@
 import { getSongViaAutocomplete } from '../../services/songService.js';
 
-export default function autocompleteController(app) {
+export default function searchSongsController(app) {
   app.get('/search', async (req, res) => {
     const {
       titleSearchValue, composerSearchValue, songSetSearchValue, sortBy, page,

@@ -26,12 +26,16 @@ export const SORT_OPTIONS = {
   SONG_CYCLE_REVERSE: 'songCycleReverse',
 };
 
-export async function getAndSortSongsAccordingToParam(sortBy, clearCache) {
-  if (clearCache) {
-    songs = [];
-    Object.keys(sortedSongArrays).forEach((key) => {
-      sortedSongArrays[key] = [];
-    });
+export function clearCache() {
+  songs = [];
+  Object.keys(sortedSongArrays).forEach((key) => {
+    sortedSongArrays[key] = [];
+  });
+}
+
+export async function getAndSortSongsAccordingToParam(sortBy, clearTheCache) {
+  if (clearTheCache) {
+    clearCache();
   }
   if (!songs || songs.length === 0) {
     songs = await SongModel.find({});
@@ -109,7 +113,16 @@ export async function getAndSortSongsAccordingToParam(sortBy, clearCache) {
   }
 }
 
-export function sortSongsByMostRecentAccompanimentRequest(songsWithRequests) {
+export async function getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest(sort = false) {
+  if (!songs || songs.length === 0) {
+    songs = await SongModel.find({});
+  }
+  const songsWithRequests = songs.filter((song) => song.accompanimentRequests
+    && song.accompanimentRequests.length > 0);
+  if (!sort) {
+    return songsWithRequests
+      .sort((a, b) => b.accompanimentRequests.length - a.accompanimentRequests.length);
+  }
   return songsWithRequests.sort((a, b) => new Date(
     b.accompanimentRequests
       .sort((c, d) => new Date(new Date(d.dateCreated) - new Date(c.dateCreated)))[0]

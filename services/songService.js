@@ -1,5 +1,8 @@
 import SongModel from '../models/songModel.js';
-import { getAndSortSongsAccordingToParam, sortSongsByMostRecentAccompanimentRequest } from '../utils/songHelpers.js';
+import {
+  getAndSortSongsAccordingToParam,
+  getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest,
+} from '../utils/songHelpers.js';
 import UserModel from '../models/userModel.js';
 
 export async function createSong(song) {
@@ -72,7 +75,6 @@ export async function addAccompanimentRequestForSong(songData, userId) {
     user.id,
     { requestedAccompaniments },
   );
-
   return (await UserModel.findById(user.id)).requestedAccompaniments;
 }
 
@@ -105,16 +107,9 @@ export async function deleteAccompanimentRequestForSong(songData, userId) {
 }
 
 // Add functionality for sorting by most recently requested
-export async function getSongsSortedByNumberOfRequests(pageNumber = 1, sortByRecency = false) {
-  const songsWithAccompanimentRequests = (await SongModel
-    .find({ 'accompanimentRequests.userId': { $exists: true } }));
-
-  if (!sortByRecency) {
-    songsWithAccompanimentRequests
-      .sort((a, b) => b.accompanimentRequests.length - a.accompanimentRequests.length);
-  } else {
-    sortSongsByMostRecentAccompanimentRequest(songsWithAccompanimentRequests);
-  }
+export async function getSongsSortedByNumberOfRequests(pageNumberObj = { page: 1 }, sortByRecency = false) {
+  const songsWithAccompanimentRequests = await getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest(sortByRecency);
+  const pageNumber = Number(pageNumberObj.page);
   const bottomOfRange = (pageNumber - 1) * 10;
   const topOfRange = pageNumber * 10;
   return {
