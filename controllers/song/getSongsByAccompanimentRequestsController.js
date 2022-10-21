@@ -4,10 +4,9 @@ export default function getSongsByAccompanimentRequestsController(app) {
   app.get('/songsByRequest', async (req, res) => {
     const {
       page,
+      sortByRecency,
     } = req.query;
-    getSongsSortedByNumberOfRequests({
-      page,
-    }).then((response) => {
+    getSongsSortedByNumberOfRequests(page, !!sortByRecency).then((response) => {
       res.status(200).send({
         status: 'OK',
         data: response,

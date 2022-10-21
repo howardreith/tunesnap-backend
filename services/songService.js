@@ -75,6 +75,9 @@ export async function addAccompanimentRequestForSong(songData, userId) {
     user.id,
     { requestedAccompaniments },
   );
+  // Do not await this, it should run in background, not delay this function.
+  // noinspection ES6MissingAwait
+  refreshCache(true);
   return (await UserModel.findById(user.id)).requestedAccompaniments;
 }
 
@@ -103,15 +106,17 @@ export async function deleteAccompanimentRequestForSong(songData, userId) {
     { requestedAccompaniments },
   );
 
+  // Do not await this, it should run in background, not delay this function.
+  // noinspection ES6MissingAwait
+  refreshCache(true);
   return (await UserModel.findById(user.id)).requestedAccompaniments;
 }
 
 // Add functionality for sorting by most recently requested
-export async function getSongsSortedByNumberOfRequests(pageNumberObj = { page: 1 }, sortByRecency = false) {
+export async function getSongsSortedByNumberOfRequests(pageNumber = 1, sortByRecency = false) {
   const songsWithAccompanimentRequests = await getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest(sortByRecency);
-  const pageNumber = Number(pageNumberObj.page);
-  const bottomOfRange = (pageNumber - 1) * 10;
-  const topOfRange = pageNumber * 10;
+  const bottomOfRange = (Number(pageNumber) - 1) * 10;
+  const topOfRange = Number(pageNumber) * 10;
   return {
     accompanimentRequestsPage: songsWithAccompanimentRequests
       .slice(bottomOfRange, topOfRange),

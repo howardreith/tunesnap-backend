@@ -2,7 +2,7 @@ import schedule from 'node-schedule';
 import SongModel from '../models/songModel.js';
 
 let songs = [];
-const sortedSongArrays = {
+let sortedSongArrays = {
   songsSortedByTitle: [],
   songsSortedByTitleReverse: [],
   songsSortedByComposer: [],
@@ -13,51 +13,51 @@ const sortedSongArrays = {
 
 export function clearCache() {
   songs = [];
-  Object.keys(sortedSongArrays).forEach((key) => {
-    sortedSongArrays[key] = [];
-  });
+  sortedSongArrays = {};
 }
 
-export async function refreshCache() {
+export async function refreshCache(songsOnly = false) {
   songs = await SongModel.find({});
-  sortedSongArrays.songsSortedByComposerReverse = [...songs].sort((a, b) => {
-    const aNameSplit = a.composer.split(' ');
-    const bNameSplit = b.composer.split(' ');
-    const aLastName = aNameSplit[aNameSplit.length - 1];
-    const bLastName = bNameSplit[bNameSplit.length - 1];
-    if (aLastName < bLastName) { return 1; }
-    if (aLastName > bLastName) { return -1; }
-    return 0;
-  });
-  sortedSongArrays.songsSortedByComposer = [...songs].sort((a, b) => {
-    const aNameSplit = a.composer.split(' ');
-    const bNameSplit = b.composer.split(' ');
-    const aLastName = aNameSplit[aNameSplit.length - 1];
-    const bLastName = bNameSplit[bNameSplit.length - 1];
-    if (aLastName < bLastName) { return -1; }
-    if (aLastName > bLastName) { return 1; }
-    return 0;
-  });
-  sortedSongArrays.songsSortedBySongCycleReverse = [...songs].sort((a, b) => {
-    if (!a.songCycle || a.songCycle < b.songCycle) { return 1; }
-    if (!b.songCycle || a.songCycle > b.songCycle) { return -1; }
-    return 0;
-  });
-  sortedSongArrays.songsSortedBySongCycle = [...songs].sort((a, b) => {
-    if (!a.songCycle || a.songCycle < b.songCycle) { return -1; }
-    if (!b.songCycle || a.songCycle > b.songCycle) { return 1; }
-    return 0;
-  });
-  sortedSongArrays.songsSortedByTitleReverse = [...songs].sort((a, b) => {
-    if (a.title < b.title) { return 1; }
-    if (a.title > b.title) { return -1; }
-    return 0;
-  });
-  sortedSongArrays.songsSortedByTitle = [...songs].sort((a, b) => {
-    if (a.title < b.title) { return -1; }
-    if (a.title > b.title) { return 1; }
-    return 0;
-  });
+  if (!songsOnly) {
+    sortedSongArrays.songsSortedByComposerReverse = [...songs].sort((a, b) => {
+      const aNameSplit = a.composer.split(' ');
+      const bNameSplit = b.composer.split(' ');
+      const aLastName = aNameSplit[aNameSplit.length - 1];
+      const bLastName = bNameSplit[bNameSplit.length - 1];
+      if (aLastName < bLastName) { return 1; }
+      if (aLastName > bLastName) { return -1; }
+      return 0;
+    });
+    sortedSongArrays.songsSortedByComposer = [...songs].sort((a, b) => {
+      const aNameSplit = a.composer.split(' ');
+      const bNameSplit = b.composer.split(' ');
+      const aLastName = aNameSplit[aNameSplit.length - 1];
+      const bLastName = bNameSplit[bNameSplit.length - 1];
+      if (aLastName < bLastName) { return -1; }
+      if (aLastName > bLastName) { return 1; }
+      return 0;
+    });
+    sortedSongArrays.songsSortedBySongCycleReverse = [...songs].sort((a, b) => {
+      if (!a.songCycle || a.songCycle < b.songCycle) { return 1; }
+      if (!b.songCycle || a.songCycle > b.songCycle) { return -1; }
+      return 0;
+    });
+    sortedSongArrays.songsSortedBySongCycle = [...songs].sort((a, b) => {
+      if (!a.songCycle || a.songCycle < b.songCycle) { return -1; }
+      if (!b.songCycle || a.songCycle > b.songCycle) { return 1; }
+      return 0;
+    });
+    sortedSongArrays.songsSortedByTitleReverse = [...songs].sort((a, b) => {
+      if (a.title < b.title) { return 1; }
+      if (a.title > b.title) { return -1; }
+      return 0;
+    });
+    sortedSongArrays.songsSortedByTitle = [...songs].sort((a, b) => {
+      if (a.title < b.title) { return -1; }
+      if (a.title > b.title) { return 1; }
+      return 0;
+    });
+  }
   // eslint-disable-next-line no-console
   console.info('Songs cache has been updated');
 }
@@ -80,7 +80,7 @@ export async function getAndSortSongsAccordingToParam(sortBy, clearTheCache) {
     clearCache();
   }
   if (!songs || songs.length === 0) {
-    await refreshCache();
+    await refreshCache(true);
   }
   switch (sortBy) {
     case SORT_OPTIONS.COMPOSER_REVERSE:
@@ -157,7 +157,7 @@ export async function getAndSortSongsAccordingToParam(sortBy, clearTheCache) {
 
 export async function getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest(sort = false) {
   if (!songs || songs.length === 0) {
-    await refreshCache();
+    await refreshCache(true);
   }
   const songsWithRequests = songs.filter((song) => song.accompanimentRequests
     && song.accompanimentRequests.length > 0);

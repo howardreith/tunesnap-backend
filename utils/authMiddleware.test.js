@@ -85,6 +85,7 @@ describe('authMiddleware', () => {
     let accompanimentWithFileThatIsNotFreeButIsOwned;
     // No token with each of these. Yes token with each of these.
     beforeEach(async () => {
+      // eslint-disable-next-line no-import-assign
       s3Helpers.uploadFile = jest.fn().mockResolvedValue({ Location: 'https://fakeAmazonS3Url' });
 
       const userWhoWillCreateStuffData = {
@@ -127,7 +128,8 @@ describe('authMiddleware', () => {
       };
       await createAccompaniment(
         accompanimentWithUrlAndNoFileThatIsFreeData,
-        userWhoWillCreateStuff._id, null,
+        userWhoWillCreateStuff._id,
+        null,
       );
 
       const accompanimentWithUrlAndNoFileThatIsNotFreeData = {
@@ -140,7 +142,8 @@ describe('authMiddleware', () => {
       };
       await createAccompaniment(
         accompanimentWithUrlAndNoFileThatIsNotFreeData,
-        userWhoWillCreateStuff._id, null,
+        userWhoWillCreateStuff._id,
+        null,
       );
 
       const accompanimentWithFileThatIsFreeData = {
@@ -158,7 +161,8 @@ describe('authMiddleware', () => {
 
       await createAccompaniment(
         accompanimentWithFileThatIsFreeData,
-        userWhoWillCreateStuff._id, freeFileData,
+        userWhoWillCreateStuff._id,
+        freeFileData,
       );
 
       const accompanimentWithFileThatIsNotFreeData = {
@@ -176,7 +180,8 @@ describe('authMiddleware', () => {
 
       await createAccompaniment(
         accompanimentWithFileThatIsNotFreeData,
-        userWhoWillCreateStuff._id, nonFreeFileData,
+        userWhoWillCreateStuff._id,
+        nonFreeFileData,
       );
 
       const accompanimentWithFileThatIsNotFreebutOwnedData = {
@@ -194,7 +199,8 @@ describe('authMiddleware', () => {
 
       const { song: updatedSong } = await createAccompaniment(
         accompanimentWithFileThatIsNotFreebutOwnedData,
-        userWhoWillCreateStuff._id, nonFreeButOwnedFileData,
+        userWhoWillCreateStuff._id,
+        nonFreeButOwnedFileData,
       );
 
       [
@@ -214,8 +220,10 @@ describe('authMiddleware', () => {
       };
       ownedAccompaniments.push(purchase);
       userWhoWillTryToAccessStuff = await UserModel
-        .findByIdAndUpdate(userWhoWillTryToAccessStuff._id,
-          { accompanimentsOwned: ownedAccompaniments });
+        .findByIdAndUpdate(
+          userWhoWillTryToAccessStuff._id,
+          { accompanimentsOwned: ownedAccompaniments },
+        );
     });
 
     it('allows access to free external accompaniment with no token', async () => {
@@ -227,7 +235,10 @@ describe('authMiddleware', () => {
     });
 
     it('allows access to free external accompaniment with token', async () => {
-      const req = { params: { id: accompanimentWithUrlAndNoFileThatIsFree._id }, headers: { authorization: `Bearer ${userWhoWillTryToAccessStuffToken}` } };
+      const req = {
+        params: { id: accompanimentWithUrlAndNoFileThatIsFree._id },
+        headers: { authorization: `Bearer ${userWhoWillTryToAccessStuffToken}` },
+      };
       const res = {};
       const next = jest.fn();
       await protectEndpointIfFileAndNotFree(req, res, next);
@@ -243,7 +254,10 @@ describe('authMiddleware', () => {
     });
 
     it('allows access to non-free external accompaniment with token', async () => {
-      const req = { params: { id: accompanimentWithUrlAndNoFileThatIsNotFree._id }, headers: { authorization: `Bearer ${userWhoWillTryToAccessStuffToken}` } };
+      const req = {
+        params: { id: accompanimentWithUrlAndNoFileThatIsNotFree._id },
+        headers: { authorization: `Bearer ${userWhoWillTryToAccessStuffToken}` },
+      };
       const res = {};
       const next = jest.fn();
       await protectEndpointIfFileAndNotFree(req, res, next);
@@ -259,7 +273,10 @@ describe('authMiddleware', () => {
     });
 
     it('allows access to free internal accompaniment with token', async () => {
-      const req = { params: { id: accompanimentWithFileThatIsFree._id }, headers: { authorization: `Bearer ${userWhoWillTryToAccessStuffToken}` } };
+      const req = {
+        params: { id: accompanimentWithFileThatIsFree._id },
+        headers: { authorization: `Bearer ${userWhoWillTryToAccessStuffToken}` },
+      };
       const res = {};
       const next = jest.fn();
       await protectEndpointIfFileAndNotFree(req, res, next);
@@ -279,7 +296,10 @@ describe('authMiddleware', () => {
     });
 
     it('blocks access to non-free internal accompaniment with token of user without ownership', async () => {
-      const req = { params: { id: accompanimentWithFileThatIsNotFree._id }, headers: { authorization: `Bearer ${userWhoWillTryToAccessStuffToken}` } };
+      const req = {
+        params: { id: accompanimentWithFileThatIsNotFree._id },
+        headers: { authorization: `Bearer ${userWhoWillTryToAccessStuffToken}` },
+      };
       const sendMock = jest.fn();
       const statusMock = jest.fn().mockReturnValue({ send: sendMock });
       const res = { status: statusMock };
@@ -287,11 +307,15 @@ describe('authMiddleware', () => {
       await protectEndpointIfFileAndNotFree(req, res, next);
       expect(next).not.toHaveBeenCalled();
       expect(statusMock).toHaveBeenCalledWith(401);
-      expect(sendMock).toHaveBeenCalledWith({ data: `User does not own ${accompanimentWithFileThatIsNotFree._id}`, status: 'Unauthorized' });
+      expect(sendMock)
+        .toHaveBeenCalledWith({ data: `User does not own ${accompanimentWithFileThatIsNotFree._id}`, status: 'Unauthorized' });
     });
 
     it('allows access to non-free internal accompaniment with token of user with ownership', async () => {
-      const req = { params: { id: accompanimentWithFileThatIsNotFreeButIsOwned._id }, headers: { authorization: `Bearer ${userWhoWillTryToAccessStuffToken}` } };
+      const req = {
+        params: { id: accompanimentWithFileThatIsNotFreeButIsOwned._id },
+        headers: { authorization: `Bearer ${userWhoWillTryToAccessStuffToken}` },
+      };
       const sendMock = jest.fn();
       const statusMock = jest.fn().mockReturnValue({ send: sendMock });
       const res = { status: statusMock };
@@ -304,7 +328,10 @@ describe('authMiddleware', () => {
     it('should respond with a 401 if the token is invalid', async () => {
       global.console.error = jest.fn();
       const badToken = jwt.sign({ id: userWhoWillTryToAccessStuff }, 'anincorrectSecret');
-      const req = { params: { id: accompanimentWithFileThatIsNotFree._id }, headers: { authorization: `Bearer ${badToken}` } };
+      const req = {
+        params: { id: accompanimentWithFileThatIsNotFree._id },
+        headers: { authorization: `Bearer ${badToken}` },
+      };
       const sendMock = jest.fn();
       const res = { status: jest.fn().mockReturnValue({ send: sendMock }) };
       const next = jest.fn();
