@@ -5,6 +5,7 @@ import SongModel from '../models/songModel.js';
 import { uploadFile, getFileAndAddItToResponse } from '../utils/s3Helpers.js';
 import UserModel from '../models/userModel.js';
 import { decodeToken } from '../utils/authHelpers.js';
+import { getRatingData } from '../utils/accompanimentHelpers.js';
 
 export async function createAccompaniment(accompanimentData, creatorId, fileToUpload) {
   if (!accompanimentData.url && !fileToUpload) {
@@ -71,8 +72,9 @@ export async function createAccompaniment(accompanimentData, creatorId, fileToUp
   return { user, song };
 }
 
-export async function getAccompanimentAtId(id) {
-  const accompaniment = await (await (await AccompanimentModel.findById(id)).populate('songId')).populate('addedBy');
+export async function getAccompanimentAtId(accompanimentId, userId) {
+  const accompaniment = await (await (await AccompanimentModel.findById(accompanimentId)).populate('songId')).populate('addedBy');
+  const { averageRating, userRating } = getRatingData(accompaniment, userId);
   return {
     _id: accompaniment._id,
     song: {
@@ -95,7 +97,8 @@ export async function getAccompanimentAtId(id) {
       size: accompaniment.file.size,
       mimetype: accompaniment.file.mimetype,
     },
-    ratings: accompaniment.ratings,
+    averageRating,
+    userRating,
     addedBy: {
       _id: accompaniment.addedBy._id,
       email: accompaniment.addedBy.email,
@@ -130,4 +133,23 @@ export async function getAccompanimentFileAtId(accompanimentId, token, res) {
   } else {
     getFileAndAddItToResponse(originalFileName, s3Key, res);
   }
+}
+
+export async function rateAccompaniment(userId, accompanimentId, rating) {
+  const relevantAccompaniment = await AccompanimentModel.findById(accompanimentId);
+  const ratings = [...relevantAccompaniment.ratings];
+  const userIdsOfRatings = ratings.map((rat) => rat.raterId.toString());
+  if (userIdsOfRatings.includes(userId.toString())) {
+    const index = userIdsOfRatings.indexOf(userId.toString());
+    ratings[index] = { raterId: userId, rating: Number(rating) };
+  } else {
+    ratings.push({ raterId: userId, rating: Number(rating) });
+  }
+  relevantAccompaniment.ratings = ratings;
+  const accompaniment = await relevantAccompaniment.save();
+  const { averageRating, userRating } = getRatingData(accompaniment, userId);
+  return {
+    averageRating,
+    userRating,
+  };
 }

@@ -18,6 +18,7 @@ import deleteAccompanimentRequestForSongController
   from '../controllers/song/deleteAccompanimentRequestForSongController.js';
 import getSongsByAccompanimentRequestsController
   from '../controllers/song/getSongsByAccompanimentRequestsController.js';
+import rateAccompanimentController from '../controllers/accompaniment/rateAccompanimentController.js';
 // import getSongTitlesController from '../controllers/admin/getSongTitlesController.js';
 // import pruneSongsController from '../controllers/admin/pruneSongsController.js';
 // import seedAriasController from '../controllers/admin/seedAriasController.js';
@@ -36,6 +37,7 @@ export default function implementControllers(app) {
   addAccompanimentToSongController(app);
   getAccompanimentByIdController(app);
   getAccompanimentFileByIdController(app);
+  rateAccompanimentController(app);
 
   // Song Controllers
   getSongAtIdController(app);

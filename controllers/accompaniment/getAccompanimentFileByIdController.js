@@ -1,6 +1,4 @@
 import { getAccompanimentFileAtId } from '../../services/accompanimentService.js';
-import { protectEndpointIfFileAndNotFree } from '../../utils/authMiddleware.js';
-import { decodeToken } from '../../utils/authHelpers.js';
 
 export default function getSongAtIdController(app) {
   app.get('/accompaniments/files/:id', async (req, res) => {

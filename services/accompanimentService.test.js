@@ -1,7 +1,7 @@
 import AccompanimentModel from '../models/accompanimentModel';
 import SongModel from '../models/songModel';
 import UserModel from '../models/userModel';
-import { createAccompaniment, getAccompanimentAtId } from './accompanimentService';
+import { createAccompaniment, getAccompanimentAtId, rateAccompaniment } from './accompanimentService';
 import { clearDatabase, connectToInMemoryDb, disconnectFromInMemoryDb } from '../utils/testHelpers';
 import * as s3Helpers from '../utils/s3Helpers';
 
@@ -18,28 +18,28 @@ describe('accompanimentService', () => {
     await clearDatabase();
   });
 
-  let savedSong;
-  let savedUser;
-  beforeEach(async () => {
-    const userData = {
-      email: 'david@gnome.com',
-      password: 'anEncryptedPassword',
-      displayName: 'David The Gnome',
-      dateJoined: new Date(),
-    };
-    const validUser = new UserModel(userData);
-    savedUser = await validUser.save();
-    const songData = {
-      title: 'Erlkonig',
-      composer: 'Franz Schubert',
-      accompaniments: [],
-    };
-    const validSong = new SongModel(songData);
-    savedSong = await validSong.save();
-    s3Helpers.uploadFile = jest.fn().mockResolvedValue({ Location: 'https://fakeAmazonS3Url' });
-  });
-
   describe('createAccompaniment', () => {
+    let savedSong;
+    let savedUser;
+    beforeEach(async () => {
+      const userData = {
+        email: 'david@gnome.com',
+        password: 'anEncryptedPassword',
+        displayName: 'David The Gnome',
+        dateJoined: new Date(),
+      };
+      const validUser = new UserModel(userData);
+      savedUser = await validUser.save();
+      const songData = {
+        title: 'Erlkonig',
+        composer: 'Franz Schubert',
+        accompaniments: [],
+      };
+      const validSong = new SongModel(songData);
+      savedSong = await validSong.save();
+      // eslint-disable-next-line no-import-assign
+      s3Helpers.uploadFile = jest.fn().mockResolvedValue({ Location: 'https://fakeAmazonS3Url' });
+    });
     it('successfully creates a linked accompaniment and adds it to a song', async () => {
       const accompanimentData = {
         songId: savedSong._id,
@@ -160,8 +160,46 @@ describe('accompanimentService', () => {
   });
 
   describe('getAccompanimentAtId', () => {
+    let savedSong;
+    let savedUser;
+    let savedUser2;
+    let savedUser3;
     let savedAccompaniment;
     beforeEach(async () => {
+      const userData = {
+        email: 'david@gnome.com',
+        password: 'anEncryptedPassword',
+        displayName: 'David The Gnome',
+        dateJoined: new Date(),
+      };
+      const validUser = new UserModel(userData);
+      savedUser = await validUser.save();
+      const userData2 = {
+        email: 'lisa@gnome.com',
+        password: 'anEncryptedPassword',
+        displayName: 'Lisa the Gnome',
+        dateJoined: new Date(),
+      };
+      const validUser2 = new UserModel(userData2);
+      savedUser2 = await validUser2.save();
+      const userData3 = {
+        email: 'swift@gnome.com',
+        password: 'anEncryptedPassword',
+        displayName: 'Swift the Fox',
+        dateJoined: new Date(),
+      };
+      const validUser3 = new UserModel(userData3);
+      savedUser3 = await validUser3.save();
+
+      const songData = {
+        title: 'Erlkonig',
+        composer: 'Franz Schubert',
+        accompaniments: [],
+      };
+      const validSong = new SongModel(songData);
+      savedSong = await validSong.save();
+      // eslint-disable-next-line no-import-assign
+      s3Helpers.uploadFile = jest.fn().mockResolvedValue({ Location: 'https://fakeAmazonS3Url' });
       const accompanimentData = {
         songId: savedSong._id,
         url: 'TBD',
@@ -183,8 +221,10 @@ describe('accompanimentService', () => {
       };
       const validAccompaniment = new AccompanimentModel(accompanimentData);
       savedAccompaniment = await validAccompaniment.save();
-      await AccompanimentModel.findByIdAndUpdate(savedAccompaniment._id,
-        { url: `${process.env.FRONT_END_URL}/songs/accompaniments/${savedAccompaniment._id}` });
+      await AccompanimentModel.findByIdAndUpdate(
+        savedAccompaniment._id,
+        { url: `${process.env.FRONT_END_URL}/songs/accompaniments/${savedAccompaniment._id}` },
+      );
       savedAccompaniment = await AccompanimentModel.findById(savedAccompaniment._id);
     });
 
@@ -195,6 +235,132 @@ describe('accompanimentService', () => {
       expect(accompaniment.file._id).toEqual(savedAccompaniment.file._id);
       expect(accompaniment.addedBy._id).toEqual(savedAccompaniment.addedBy);
       expect(accompaniment.file).toBeTruthy();
+    });
+
+    it('returns the average rating of all ratings in the accompaniment', async () => {
+      const ratings = [
+        { raterId: savedUser._id.toString(), rating: 5 },
+        { raterId: savedUser2._id.toString(), rating: 3 },
+        { raterId: savedUser3._id.toString(), rating: 2 },
+      ];
+      await AccompanimentModel.findByIdAndUpdate(
+        savedAccompaniment._id,
+        { ratings },
+      );
+      const accompaniment = await getAccompanimentAtId(savedAccompaniment._id);
+      expect(accompaniment.averageRating).toEqual(3.3);
+    });
+
+    it('returns the user rating if present', async () => {
+      const ratings = [
+        { raterId: savedUser._id.toString(), rating: 5 },
+        { raterId: savedUser2._id.toString(), rating: 3 },
+        { raterId: savedUser3._id.toString(), rating: 2 },
+      ];
+      await AccompanimentModel.findByIdAndUpdate(
+        savedAccompaniment._id,
+        { ratings },
+      );
+      const accompaniment = await getAccompanimentAtId(savedAccompaniment._id, savedUser._id.toString());
+      expect(accompaniment.userRating).toEqual(ratings[0].rating);
+    });
+
+    it('returns a null user rating if not present', async () => {
+      const ratings = [
+        { raterId: savedUser._id.toString(), rating: 5 },
+        { raterId: savedUser2._id.toString(), rating: 3 },
+      ];
+      await AccompanimentModel.findByIdAndUpdate(
+        savedAccompaniment._id,
+        { ratings },
+      );
+      const accompaniment = await getAccompanimentAtId(savedAccompaniment._id, savedUser3._id.toString());
+      expect(accompaniment.userRating).toEqual(null);
+    });
+  });
+
+  describe('rateAccompaniment', () => {
+    let savedSong;
+    let savedUser;
+    let savedUser2;
+    let savedAccompaniment;
+    beforeEach(async () => {
+      const userData = {
+        email: 'david@gnome.com',
+        password: 'anEncryptedPassword',
+        displayName: 'David The Gnome',
+        dateJoined: new Date(),
+      };
+      const validUser = new UserModel(userData);
+      savedUser = await validUser.save();
+      const userData2 = {
+        email: 'lisa@gnome.com',
+        password: 'anEncryptedPassword',
+        displayName: 'Lisa The Gnome',
+        dateJoined: new Date(),
+      };
+      const validUser2 = new UserModel(userData);
+      savedUser2 = await validUser2.save();
+      const songData = {
+        title: 'Erlkonig',
+        composer: 'Franz Schubert',
+        accompaniments: [],
+      };
+      const validSong = new SongModel(songData);
+      savedSong = await validSong.save();
+      // eslint-disable-next-line no-import-assign
+      s3Helpers.uploadFile = jest.fn().mockResolvedValue({ Location: 'https://fakeAmazonS3Url' });
+
+      const accompanimentData = {
+        songId: savedSong._id,
+        url: 'TBD',
+        artist: 'David the Gnome',
+        dateCreated: new Date(),
+        dateUpdated: new Date(),
+        price: 0,
+        currency: 'USD',
+        key: 'D Minor',
+        file: {
+          originalFileName: 'ErlkonigAccompaniment.mp3',
+          mimetype: 'mp3',
+          size: '1000',
+          url: 'https://amazonAwsLink',
+          s3Key: 'e55543c697a1a74f31938af03359163c',
+        },
+        ratings: [],
+        addedBy: savedUser._id,
+      };
+      const validAccompaniment = new AccompanimentModel(accompanimentData);
+      savedAccompaniment = await validAccompaniment.save();
+      await AccompanimentModel.findByIdAndUpdate(
+        savedAccompaniment._id,
+        { url: `${process.env.FRONT_END_URL}/songs/accompaniments/${savedAccompaniment._id}` },
+      );
+      savedAccompaniment = await AccompanimentModel.findById(savedAccompaniment._id);
+    });
+
+    it('pushes the rating into the ratings list', async () => {
+      const rating = 5;
+      await rateAccompaniment(savedUser._id.toString(), savedAccompaniment._id.toString(), rating);
+      const updatedInDb = await AccompanimentModel.findById(savedAccompaniment._id.toString());
+      expect(updatedInDb.ratings[0].raterId.toString()).toEqual(savedUser._id.toString());
+      expect(updatedInDb.ratings[0].rating).toEqual(rating);
+    });
+
+    it('updates a rating if already in the list', async () => {
+      const rating = 3;
+      await rateAccompaniment(savedUser._id.toString(), savedAccompaniment._id.toString(), 5);
+      await rateAccompaniment(savedUser._id.toString(), savedAccompaniment._id.toString(), rating);
+      const updatedInDb = await AccompanimentModel.findById(savedAccompaniment._id.toString());
+      expect(updatedInDb.ratings[0].raterId.toString()).toEqual(savedUser._id.toString());
+      expect(updatedInDb.ratings[0].rating).toEqual(rating);
+    });
+
+    it('returns the userRating and averageRating', async () => {
+      await rateAccompaniment(savedUser._id.toString(), savedAccompaniment._id.toString(), 5);
+      const result = await rateAccompaniment(savedUser2._id.toString(), savedAccompaniment._id.toString(), 3);
+      const expected = { userRating: 3, averageRating: 4 };
+      expect(result).toEqual(expected);
     });
   });
 });

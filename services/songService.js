@@ -112,7 +112,6 @@ export async function deleteAccompanimentRequestForSong(songData, userId) {
   return (await UserModel.findById(user.id)).requestedAccompaniments;
 }
 
-// Add functionality for sorting by most recently requested
 export async function getSongsSortedByNumberOfRequests(pageNumber = 1, sortByRecency = false) {
   const songsWithAccompanimentRequests = await getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest(sortByRecency);
   const bottomOfRange = (Number(pageNumber) - 1) * 10;
