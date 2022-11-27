@@ -299,7 +299,7 @@ describe('accompanimentService', () => {
         displayName: 'Lisa The Gnome',
         dateJoined: new Date(),
       };
-      const validUser2 = new UserModel(userData);
+      const validUser2 = new UserModel(userData2);
       savedUser2 = await validUser2.save();
       const songData = {
         title: 'Erlkonig',

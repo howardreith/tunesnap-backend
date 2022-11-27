@@ -6,7 +6,7 @@ export function generateToken(userId) {
 
 export function decodeToken(token) {
   let parsedToken = token;
-  if (parsedToken.startsWith('Bearer ')) {
+  if (parsedToken && parsedToken.startsWith('Bearer ')) {
     parsedToken = parsedToken.replace('Bearer ', '');
   }
   if (!parsedToken || ['null', 'undefined'].includes(parsedToken)) {

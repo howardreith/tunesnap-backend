@@ -4,6 +4,7 @@ import {
   getSongsWithRequestsOptionallySortedByMostRecentAccompanimentRequest, refreshCache,
 } from '../utils/songHelpers.js';
 import UserModel from '../models/userModel.js';
+import { getRatingData } from '../utils/accompanimentHelpers.js';
 
 export async function createSong(song) {
   const songData = { ...song };
@@ -14,9 +15,31 @@ export async function createSong(song) {
   return newSong.save();
 }
 
-export async function getSongAtId(id) {
-  const song = await SongModel.findById(id);
-  return song.populate('accompaniments');
+export async function getSongAtId(songId, userId) {
+  const song = await (await SongModel.findById(songId)).populate('accompaniments');
+  const {
+    _id, title, composer, lyricist, compositionDate, opusNumber, textAndTranslation, accompaniments, accompanimentRequests,
+  } = song;
+  const parsedAccompaniments = song.accompaniments.map((acc) => {
+    const {
+      _id: accompId, url, artist, key, price,
+    } = acc;
+    const { userRating, averageRating } = getRatingData(acc, userId);
+    return {
+      _id: accompId, url, artist, userRating, averageRating, key, price,
+    };
+  });
+  return {
+    _id,
+    title,
+    composer,
+    lyricist,
+    compositionDate,
+    opusNumber,
+    textAndTranslation,
+    accompaniments: parsedAccompaniments,
+    accompanimentRequests,
+  };
 }
 
 export async function getAllSongs(filter = {}, limit = 10) {

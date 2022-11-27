@@ -47,14 +47,78 @@ describe('songService', () => {
   });
 
   describe('getSongAtId', () => {
-    it('retrieves the song at the given _id', async () => {
-      const songData = { title: 'Erlkonig', composer: 'Franz Schubert', accompaniments: [] };
+    let savedUser;
+    let savedSong;
+    let savedAccompaniment;
+    beforeEach(async () => {
+      const userData = {
+        email: 'david@gnome.com',
+        password: 'anEncryptedPassword',
+        displayName: 'David The Gnome',
+        dateJoined: new Date(),
+      };
+      const validUser = new UserModel(userData);
+      savedUser = await validUser.save();
+      const songData = {
+        title: 'Erlkonig',
+        composer: 'Franz Schubert',
+        lyricist: 'Mr. Pants',
+        compositionDate: new Date(),
+        opusNumber: 55,
+        songCycle: undefined,
+        songCycleIndex: undefined,
+        textAndTranslation: 'https://bananapants.com',
+        role: undefined,
+        fach: undefined,
+        accompaniments: [],
+        accompanimentRequestss: [],
+      };
       const validSong = new SongModel(songData);
-      const savedSong = await validSong.save();
-      const id = savedSong._id;
-      const retrievedSong = await getSongAtId(id);
-      expect(retrievedSong.title).toEqual(songData.title);
-      expect(retrievedSong.composer).toEqual(songData.composer);
+      savedSong = await validSong.save();
+      const accompanimentData = {
+        songId: savedSong._id,
+        url: 'TBD',
+        artist: 'David the Gnome',
+        dateCreated: new Date(),
+        dateUpdated: new Date(),
+        price: 0,
+        currency: 'USD',
+        key: 'D Minor',
+        file: {
+          originalFileName: 'ErlkonigAccompaniment.mp3',
+          mimetype: 'mp3',
+          size: '1000',
+          url: 'https://amazonAwsLink',
+          s3Key: 'e55543c697a1a74f31938af03359163c',
+        },
+        ratings: [{ raterId: savedUser._id.toString(), rating: 5 }],
+        addedBy: savedUser._id,
+      };
+      const validAccompaniment = new AccompanimentModel(accompanimentData);
+      savedAccompaniment = await validAccompaniment.save();
+      await SongModel.findByIdAndUpdate(
+        savedSong._id,
+        { accompaniments: [savedAccompaniment._id] },
+      );
+    });
+
+    it('retrieves the song at the given _id', async () => {
+      const retrievedSong = await getSongAtId(savedSong._id.toString(), savedUser._id.toString());
+      expect(retrievedSong.title).toEqual(savedSong.title);
+      expect(retrievedSong.composer).toEqual(savedSong.composer);
+      expect(retrievedSong._id).toEqual(savedSong._id);
+      expect(retrievedSong.lyricist).toEqual(savedSong.lyricist);
+      expect(retrievedSong.compositionDate).toEqual(savedSong.compositionDate);
+      expect(retrievedSong.opusNumber).toEqual(savedSong.opusNumber);
+      expect(retrievedSong.textAndTranslation).toEqual(savedSong.textAndTranslation);
+      expect(retrievedSong.accompanimentRequests).toEqual(savedSong.accompanimentRequests);
+      expect(retrievedSong.accompaniments[0]._id).toEqual(savedAccompaniment._id);
+      expect(retrievedSong.accompaniments[0].url).toEqual(savedAccompaniment.url);
+      expect(retrievedSong.accompaniments[0].artist).toEqual(savedAccompaniment.artist);
+      expect(retrievedSong.accompaniments[0].key).toEqual(savedAccompaniment.key);
+      expect(retrievedSong.accompaniments[0].price).toEqual(savedAccompaniment.price);
+      expect(retrievedSong.accompaniments[0].averageRating).toEqual(5);
+      expect(retrievedSong.accompaniments[0].userRating).toEqual(5);
     });
   });
 
