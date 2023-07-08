@@ -12,13 +12,6 @@ export async function createSale(saleData, purchaserId) {
     purchaserId,
     accompanimentsSold: detailedAccompanimentsSold,
     dateCreated: new Date(),
-    paypalOrderId: saleData.paypalOrderId,
-    paypalOrderStatus: saleData.paypalOrderStatus,
-    paypalCreateTime: saleData.paypalCreateTime,
-    paypalPayerEmailAddress: saleData.paypalPayerEmailAddress,
-    paypalPayerId: saleData.paypalPayerId,
-    paypalPayeeEmailAddress: saleData.paypalPayeeEmailAddress,
-    paypalPayeeId: saleData.paypalPayeeId,
     currency: saleData.currency,
     totalPrice: saleData.totalPrice,
   };

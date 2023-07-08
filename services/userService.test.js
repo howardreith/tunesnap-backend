@@ -79,7 +79,8 @@ describe('userService', () => {
 
     const { song: updatedSong } = await createAccompaniment(
       accompanimentWithFileThatIsNotFreeData,
-      userWhoWillCreateStuff._id, nonFreeFileData,
+      userWhoWillCreateStuff._id,
+      nonFreeFileData,
     );
 
     [accompanimentWithFileThatIsNotFree] = updatedSong.accompaniments;
@@ -160,8 +161,10 @@ describe('userService', () => {
 
   describe('updatePassword', () => {
     it('should throw with an invalid user id', async () => {
-      await expect(updatePassword('myNewPassword',
-        'aninvalidIdd'))
+      await expect(updatePassword(
+        'myNewPassword',
+        'aninvalidIdd',
+      ))
         .rejects.toThrowError('User at ID aninvalidIdd not found');
     });
 
@@ -177,9 +180,7 @@ describe('userService', () => {
 
   describe('addAccompanimentToCart', () => {
     it('should add an accompaniment to the cart', async () => {
-      const result = await addAccompanimentToCart(
-        accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString(),
-      );
+      const result = await addAccompanimentToCart(accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString());
       expect(result.length).toEqual(1);
       expect(result[0].toString()).toEqual(accompanimentWithFileThatIsNotFree._id.toString());
 
@@ -190,9 +191,7 @@ describe('userService', () => {
     });
 
     it('should add an accompaniment to a cart that already has accompaniments', async () => {
-      await addAccompanimentToCart(
-        accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString(),
-      );
+      await addAccompanimentToCart(accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString());
       const accompanimentWithFileThatIsNotFreeDataPart2 = {
         songId: savedSong._id,
         dateCreated: new Date(),
@@ -208,7 +207,8 @@ describe('userService', () => {
 
       const { song: updatedSong2 } = await createAccompaniment(
         accompanimentWithFileThatIsNotFreeDataPart2,
-        userWhoWillCreateStuff._id, nonFreeFileDataPart2,
+        userWhoWillCreateStuff._id,
+        nonFreeFileDataPart2,
       );
 
       let accompanimentWithFileThatIsNotFreePart2;
@@ -216,9 +216,7 @@ describe('userService', () => {
         accompanimentWithFileThatIsNotFreePart2] = updatedSong2.accompaniments;
 
       // Now the actual test
-      const result = await addAccompanimentToCart(
-        accompanimentWithFileThatIsNotFreePart2._id.toString(), savedStockUser._id.toString(),
-      );
+      const result = await addAccompanimentToCart(accompanimentWithFileThatIsNotFreePart2._id.toString(), savedStockUser._id.toString());
       expect(result.length).toEqual(2);
       expect(result[1].toString()).toEqual(accompanimentWithFileThatIsNotFreePart2._id.toString());
 
@@ -229,28 +227,20 @@ describe('userService', () => {
     });
 
     it('should throw if the accompaniment is already in the cart', async () => {
-      await addAccompanimentToCart(
-        accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString(),
-      );
-      await expect(addAccompanimentToCart(
-        accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString(),
-      )).rejects.toThrowError('Accompaniment already in cart.');
+      await addAccompanimentToCart(accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString());
+      await expect(addAccompanimentToCart(accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString())).rejects.toThrowError('Accompaniment already in cart.');
     });
   });
 
   describe('removeAccompanimentFromCart', () => {
     let initialAccompanimentInCart;
     beforeEach(async () => {
-      [initialAccompanimentInCart] = await addAccompanimentToCart(
-        accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString(),
-      );
+      [initialAccompanimentInCart] = await addAccompanimentToCart(accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString());
     });
     it('removes the accompanimentFromCart', async () => {
       const initial = await UserModel.findById(savedStockUser._id);
       expect(initial.cart.length).toEqual(1);
-      const result = await removeAccompanimentFromCart(
-        initialAccompanimentInCart._id.toString(), savedStockUser._id.toString(),
-      );
+      const result = await removeAccompanimentFromCart(initialAccompanimentInCart._id.toString(), savedStockUser._id.toString());
       const updated = await UserModel.findById(savedStockUser._id);
       expect(updated.cart.length).toEqual(0);
       expect(result).toEqual([]);
@@ -272,21 +262,18 @@ describe('userService', () => {
 
       const { song: updatedSong2 } = await createAccompaniment(
         accompanimentWithFileThatIsNotFreeDataPart2,
-        userWhoWillCreateStuff._id, nonFreeFileDataPart2,
+        userWhoWillCreateStuff._id,
+        nonFreeFileDataPart2,
       );
 
       let initialAccompanimentTwo;
       [initialAccompanimentInCart,
         initialAccompanimentTwo] = updatedSong2.accompaniments;
-      await addAccompanimentToCart(
-        initialAccompanimentTwo._id.toString(), savedStockUser._id.toString(),
-      );
+      await addAccompanimentToCart(initialAccompanimentTwo._id.toString(), savedStockUser._id.toString());
 
       const initial = await UserModel.findById(savedStockUser._id);
       expect(initial.cart.length).toEqual(2);
-      const result = await removeAccompanimentFromCart(
-        initialAccompanimentInCart._id.toString(), savedStockUser._id.toString(),
-      );
+      const result = await removeAccompanimentFromCart(initialAccompanimentInCart._id.toString(), savedStockUser._id.toString());
       const updated = await UserModel.findById(savedStockUser._id);
       expect(updated.cart.length).toEqual(1);
       expect(updated.cart[0]._id).toEqual(initialAccompanimentTwo._id);
@@ -318,9 +305,7 @@ describe('userService', () => {
 
   describe('getCart', () => {
     beforeEach(async () => {
-      await addAccompanimentToCart(
-        accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString(),
-      );
+      await addAccompanimentToCart(accompanimentWithFileThatIsNotFree._id.toString(), savedStockUser._id.toString());
     });
 
     it('returns the cart with filtered values', async () => {

@@ -5,13 +5,6 @@ const saleModel = new mongoose.Schema({
   purchaserId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
   accompanimentsSold: [{ type: accompanimentsOwnedSchema }],
   dateCreated: { type: Date, required: true },
-  paypalOrderId: String,
-  paypalOrderStatus: String,
-  paypalCreateTime: Date,
-  paypalPayerEmailAddress: String,
-  paypalPayerId: String,
-  paypalPayeeEmailAddress: String,
-  paypalPayeeId: String,
   currency: String,
   totalPrice: String,
 

@@ -83,13 +83,6 @@ describe('saleService', () => {
           currency: savedAccompaniment.currency,
           dateOfPurchase: new Date(),
         }],
-        paypalOrderId: '76T69974F1046420A',
-        paypalOrderStatus: 'COMPLETED',
-        paypalCreateTime: new Date().toISOString(),
-        paypalPayerEmailAddress: secondSavedUser.email,
-        paypalPayerId: 'KE6JN42PWJWAA',
-        paypalPayeeEmailAddress: savedUser.email,
-        paypalPayeeId: 'VWCZS6EL3BZ4U',
         currency: 'USD',
         totalPrice: 5,
       };
@@ -113,13 +106,6 @@ describe('saleService', () => {
           currency: savedAccompaniment.currency,
           dateOfPurchase: new Date(),
         }],
-        paypalOrderId: '76T69974F1046420A',
-        paypalOrderStatus: 'COMPLETED',
-        paypalCreateTime: new Date().toISOString(),
-        paypalPayerEmailAddress: secondSavedUser.email,
-        paypalPayerId: 'KE6JN42PWJWAA',
-        paypalPayeeEmailAddress: savedUser.email,
-        paypalPayeeId: 'VWCZS6EL3BZ4U',
         currency: 'USD',
         totalPrice: 5,
       };
@@ -129,7 +115,7 @@ describe('saleService', () => {
       expect(inDbResult).toBeTruthy();
       expect(inDbResult._id).toEqual(result.saleId);
       Object.keys(saleData)
-        .filter((key) => !['accompanimentsSold', 'paypalCreateTime', 'totalPrice'].includes(key))
+        .filter((key) => !['accompanimentsSold', 'totalPrice'].includes(key))
         .forEach((dataKey) => {
           try {
             expect(inDbResult[dataKey]).toEqual(saleData[dataKey]);
@@ -152,13 +138,6 @@ describe('saleService', () => {
           currency: savedAccompaniment.currency,
           dateOfPurchase: new Date(),
         }],
-        paypalOrderId: '76T69974F1046420A',
-        paypalOrderStatus: 'COMPLETED',
-        paypalCreateTime: new Date().toISOString(),
-        paypalPayerEmailAddress: secondSavedUser.email,
-        paypalPayerId: 'KE6JN42PWJWAA',
-        paypalPayeeEmailAddress: savedUser.email,
-        paypalPayeeId: 'VWCZS6EL3BZ4U',
         currency: 'USD',
         totalPrice: 5,
       };

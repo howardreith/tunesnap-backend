@@ -71,13 +71,6 @@ describe('SalesModel', () => {
         dateOfPurchase: new Date(),
       }],
       dateCreated: new Date(),
-      paypalOrderId: '42N12387NX193033H',
-      paypalOrderStatus: 'COMPLETED',
-      paypalCreateTime: new Date(),
-      paypalPayerEmailAddress: 'david@gnome.com',
-      paypalPayerId: '4SSMBPA8UZR68',
-      paypalPayeeEmailAddress: 'tunesnap@gmail.com',
-      paypalPayeeId: 'VWCZS6EL3BZ4U',
       currency: 'USD',
       totalPrice: 1,
     };
