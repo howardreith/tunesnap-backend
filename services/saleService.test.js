@@ -40,6 +40,7 @@ describe('saleService', () => {
     };
     const validSong = new SongModel(songData);
     savedSong = await validSong.save();
+    // eslint-disable-next-line no-import-assign
     s3Helpers.uploadFile = jest.fn().mockResolvedValue({ Location: 'https://fakeAmazonS3Url' });
 
     const accompanimentData = {

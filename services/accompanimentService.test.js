@@ -1,3 +1,5 @@
+// eslint-disable-next-line jest/no-mocks-import
+import { Stripe } from './__mocks__/stripe.js';
 import AccompanimentModel from '../models/accompanimentModel';
 import SongModel from '../models/songModel';
 import UserModel from '../models/userModel';
@@ -40,6 +42,7 @@ describe('accompanimentService', () => {
       // eslint-disable-next-line no-import-assign
       s3Helpers.uploadFile = jest.fn().mockResolvedValue({ Location: 'https://fakeAmazonS3Url' });
     });
+
     it('successfully creates a linked accompaniment and adds it to a song', async () => {
       const accompanimentData = {
         songId: savedSong._id,
@@ -73,7 +76,7 @@ describe('accompanimentService', () => {
         mimetype: 'mp3',
         size: '1mb',
       };
-      const { song: songWithCreatedAccompaniment, user } = await createAccompaniment(
+      const { song: songWithCreatedAccompaniment, user, newAccompanimentId } = await createAccompaniment(
         accompanimentData,
         savedUser._id.toString(),
         fileData,
@@ -98,6 +101,9 @@ describe('accompanimentService', () => {
         .toEqual(createdAccompaniment._id.toString());
       expect(user.accompanimentsOwned[0].accompaniment.toString())
         .toEqual(createdAccompaniment._id.toString());
+      expect(newAccompanimentId).toBeTruthy();
+      expect(user.accompanimentsOwned[0].accompaniment.toString())
+        .toEqual(newAccompanimentId);
     });
 
     it('adds linked accompaniment to the creators list of submissions', async () => {
@@ -156,6 +162,60 @@ describe('accompanimentService', () => {
       };
       await expect(createAccompaniment(accompanimentData, savedUser._id.toString(), undefined))
         .rejects.toThrowError('Must have either a URL or a file to upload');
+    });
+
+    it('creates the new product in stripe when a price is present', async () => {
+      Stripe.prototype.products.create = jest.fn().mockImplementation(({ name }) => ({
+        id: 'prod_OE1mM6JkyLDtHZ',
+        name,
+        created: new Date().getTime() / 1000,
+        updated: new Date().getTime() / 1000,
+      }));
+      const accompanimentData = {
+        songId: savedSong._id,
+        price: 6.50,
+      };
+      const fileData = {
+        originalname: 'testFile.mp3',
+        mimetype: 'mp3',
+        size: '1mb',
+      };
+      const createAccompanimentResult = await createAccompaniment(
+        accompanimentData,
+        savedUser._id.toString(),
+        fileData,
+      );
+      expect(Stripe.prototype.products.create).toHaveBeenCalledWith({
+        default_price_data: {
+          currency: 'usd',
+          unit_amount: 650,
+        },
+        name: createAccompanimentResult.newAccompanimentId,
+      });
+    });
+
+    it('adds the stripe metadata to the database when purchaseable', async () => {
+      const accompanimentData = {
+        songId: savedSong._id,
+        price: 6.50,
+      };
+      const fileData = {
+        originalname: 'testFile.mp3',
+        mimetype: 'mp3',
+        size: '1mb',
+      };
+      const createAccompanimentResult = await createAccompaniment(
+        accompanimentData,
+        savedUser._id.toString(),
+        fileData,
+      );
+
+      const newAccomp = await AccompanimentModel.findById(createAccompanimentResult.newAccompanimentId);
+      expect(newAccomp.stripe.id).toEqual('prod_OE1mM6JkyLDtHZ');
+      expect(newAccomp.stripe.created).toBeTruthy();
+      expect(newAccomp.stripe.name).toEqual(createAccompanimentResult.newAccompanimentId);
+      expect(newAccomp.stripe.updated).toBeTruthy();
+      expect(newAccomp.stripe._id).toBeTruthy();
     });
   });
 

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import stripe from 'stripe';
 import AccompanimentModel from '../models/accompanimentModel.js';
 import SongModel from '../models/songModel.js';
 import { uploadFile, getFileAndAddItToResponse } from '../utils/s3Helpers.js';
@@ -7,6 +8,7 @@ import UserModel from '../models/userModel.js';
 import { decodeToken } from '../utils/authHelpers.js';
 import { getRatingData } from '../utils/accompanimentHelpers.js';
 
+const stripeInitialized = stripe(process.env.STRIPE_SECRET_KEY);
 export async function createAccompaniment(accompanimentData, creatorId, fileToUpload) {
   if (!accompanimentData.url && !fileToUpload) {
     throw Error('Must have either a URL or a file to upload');
@@ -22,6 +24,7 @@ export async function createAccompaniment(accompanimentData, creatorId, fileToUp
     price: accompanimentData.price,
     key: accompanimentData.key,
   };
+
   if (fileToUpload) {
     const uploadResult = await uploadFile(fileToUpload);
     parsedData = {
@@ -35,6 +38,7 @@ export async function createAccompaniment(accompanimentData, creatorId, fileToUp
       },
     };
   }
+
   const newAccompaniment = new AccompanimentModel(parsedData);
   let savedAccompaniment;
   try {
@@ -42,7 +46,34 @@ export async function createAccompaniment(accompanimentData, creatorId, fileToUp
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('Error saving accompaniment: ', e);
+    throw e;
   }
+
+  if (accompanimentData.price) {
+    try {
+      const productInStripe = await stripeInitialized.products.create({
+        name: `${savedAccompaniment._id}`,
+        default_price_data: {
+          currency: 'usd',
+          unit_amount: Number(parsedData.price) * 100,
+        },
+      });
+      await AccompanimentModel.findByIdAndUpdate(savedAccompaniment._id.toString(), {
+        stripe: {
+          id: productInStripe.id,
+          name: productInStripe.name,
+          created: Number(productInStripe.created),
+          updated: Number(productInStripe.updated),
+          stripeIdOfCreator: 'TBD',
+        },
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Error processing Stripe: ', e);
+      throw e;
+    }
+  }
+
   let song = await SongModel.findById(accompanimentData.songId);
   const accompaniments = [...song.accompaniments, savedAccompaniment._id];
   await SongModel.findByIdAndUpdate(accompanimentData.songId, { accompaniments });
@@ -69,7 +100,7 @@ export async function createAccompaniment(accompanimentData, creatorId, fileToUp
   }
 
   song = await SongModel.findById(accompanimentData.songId).populate('accompaniments');
-  return { user, song };
+  return { user, song, newAccompanimentId: savedAccompaniment._id.toString() };
 }
 
 export async function getAccompanimentAtId(accompanimentId, userId) {
